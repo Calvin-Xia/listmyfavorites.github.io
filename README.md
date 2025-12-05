@@ -19,7 +19,7 @@
 
 由于这是一个纯静态网站，数据存储在 GitHub Gist 上，以实现多端同步。要添加新的收藏，请按照以下步骤操作：
 
-1.  访问你的数据源 Gist：[https://gist.github.com/Calvin-Xia/9c84112f9a5affcc63d4693a6282f74f](https://gist.github.com/Calvin-Xia/9c84112f9a5affcc63d4693a6282f74f)
+1.  访问你的数据源 Gist
 2.  点击 "Edit" 按钮。
 3.  在 JSON 数组中添加一个新的对象，格式如下：
 
