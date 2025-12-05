@@ -9,6 +9,7 @@ let githubToken = localStorage.getItem('github_token');
 
 // DOM 元素
 const searchInput = document.getElementById('searchInput');
+const exactMatchCheckbox = document.getElementById('exactMatch');
 const favoritesList = document.getElementById('favoritesList');
 const noResults = document.getElementById('noResults');
 
@@ -32,6 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // 监听搜索输入
 searchInput.addEventListener('input', (e) => {
     const searchTerm = e.target.value.trim().toLowerCase();
+    filterFavorites(searchTerm);
+});
+
+// 监听精确匹配切换
+exactMatchCheckbox.addEventListener('change', () => {
+    const searchTerm = searchInput.value.trim().toLowerCase();
     filterFavorites(searchTerm);
 });
 
@@ -95,15 +102,53 @@ function filterFavorites(searchTerm) {
         return;
     }
 
-    const filteredItems = favoritesData.filter(item => {
-        return (
-            item.name.toLowerCase().includes(searchTerm) ||
-            item.url.toLowerCase().includes(searchTerm) ||
-            (item.description && item.description.toLowerCase().includes(searchTerm))
-        );
-    });
+    const isExact = exactMatchCheckbox.checked;
+    let filteredItems = [];
+
+    if (isExact) {
+        // --- 精确搜索 (子序列匹配) ---
+        // 逻辑：搜索词的所有字符必须按顺序出现在目标中
+        // 例如：输入 "gh" 可以匹配 "GitHub" (G...H...)
+        filteredItems = favoritesData.filter(item => {
+            // 组合所有字段进行搜索
+            const targetText = `${item.name} ${item.url} ${item.description || ''}`.toLowerCase();
+            return isSubsequence(searchTerm, targetText);
+        });
+    } else {
+        // --- 模糊搜索 (Fuse.js 容错匹配) ---
+        // 逻辑：允许拼写错误、位置偏差
+        // 例如：输入 "gogle" 可以匹配 "Google"
+        
+        const options = {
+            includeScore: true,
+            threshold: 0.4, // 阈值：0.0 是完全匹配，1.0 是匹配任何内容。0.4 允许一定程度的拼写错误
+            keys: ['name', 'url', 'description']
+        };
+
+        const fuse = new Fuse(favoritesData, options);
+        const result = fuse.search(searchTerm);
+        
+        // Fuse 返回的是 { item: ..., score: ... } 结构，需要提取 item
+        filteredItems = result.map(res => res.item);
+    }
 
     renderFavorites(filteredItems);
+}
+
+// 算法：判断 s1 是否是 s2 的子序列 (顺序匹配)
+function isSubsequence(s1, s2) {
+    let i = 0; // s1 的指针
+    let j = 0; // s2 的指针
+    
+    while (i < s1.length && j < s2.length) {
+        if (s1[i] === s2[j]) {
+            i++;
+        }
+        j++;
+    }
+    
+    // 如果 s1 的所有字符都找到了，返回 true
+    return i === s1.length;
 }
 
 // --- Modal & Token Logic ---

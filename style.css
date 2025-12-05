@@ -58,6 +58,27 @@ h1 {
     border-color: var(--primary-color);
 }
 
+.search-options {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+    user-select: none;
+}
+
+.checkbox-label input {
+    margin-right: 6px;
+    cursor: pointer;
+}
+
 .add-btn {
     margin-top: 20px;
     padding: 8px 20px;
