@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的收藏夹</title>
     <link rel="stylesheet" href="style.css">
+    <!-- 引入 Fuse.js 用于模糊搜索 -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 </head>
 <body>
     <div class="container">
@@ -12,6 +14,11 @@
             <h1>我的网络收藏夹</h1>
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="搜索网站名称或网址...">
+                <div class="search-options">
+                    <label class="checkbox-label" title="勾选后：输入字符必须按顺序存在（如 'gh' 匹配 'GitHub'）&#10;不勾选：允许拼写错误（如 'gogle' 匹配 'Google'）">
+                        <input type="checkbox" id="exactMatch" checked> 精确搜索 (顺序匹配)
+                    </label>
+                </div>
             </div>
             <button id="addBtn" class="add-btn">＋ 添加</button>
         </header>
