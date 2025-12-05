@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的收藏夹</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>我的网络收藏夹</h1>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索网站名称或网址...">
+            </div>
+            <button id="addBtn" class="add-btn">＋ 添加</button>
+        </header>
+        
+        <main>
+            <div id="favoritesList" class="favorites-grid">
+                <!-- 收藏项将通过 JavaScript 动态插入这里 -->
+            </div>
+            <div id="noResults" class="no-results" style="display: none;">
+                没有找到匹配的网站
+            </div>
+        </main>
+
+        <!-- 添加/配置模态框 -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2 id="modalTitle">添加新收藏</h2>
+                
+                <!-- Token 设置区域 -->
+                <div id="tokenSection" style="display:none;">
+                    <p class="tip">首次使用需要配置 GitHub Token (需开启 Gist 权限)</p>
+                    <input type="password" id="tokenInput" placeholder="粘贴 GitHub Personal Access Token">
+                    <button id="saveTokenBtn" class="primary-btn">保存配置</button>
+                    <p class="small-tip"><a href="https://github.com/settings/tokens" target="_blank">去 GitHub 申请 Token &rarr;</a></p>
+                </div>
+
+                <!-- 添加表单区域 -->
+                <form id="addForm" style="display:none;">
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" id="siteName" placeholder="例如: GitHub" required>
+                    </div>
+                    <div class="form-group">
+                        <label>网址</label>
+                        <input type="url" id="siteUrl" placeholder="https://..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>描述 (可选)</label>
+                        <input type="text" id="siteDesc" placeholder="简短的描述...">
+                    </div>
+                    <button type="submit" class="primary-btn" id="submitBtn">保存到 Gist</button>
+                    <div class="form-footer">
+                        <span id="statusMsg"></span>
+                        <button type="button" id="clearTokenBtn" class="text-btn">重置 Token</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 My Favorites</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
