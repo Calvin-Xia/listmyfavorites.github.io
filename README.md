@@ -1,44 +1,48 @@
 # 我的网络收藏夹 (My Favorites)
 
-这是一个简单、快速的静态网页收藏夹，用于存储和搜索常用的网站链接。
+> 一个纯静态、云同步的个人收藏夹。
 
-## 功能特点
+## Table of Contents
+- [我的网络收藏夹 (My Favorites)](#我的网络收藏夹-my-favorites)
+  - [Table of Contents](#table-of-contents)
+  - [Background](#background)
+  - [Features](#features)
+  - [Usage](#usage)
+  - [Configuration](#configuration)
+  - [Development](#development)
+  - [Maintainers](#maintainers)
+  - [Contributing](#contributing)
+  - [License](#license)
 
-*   **极简设计**：清晰的卡片式布局。
-*   **即时搜索**：支持通过网站名称、URL 或描述进行模糊搜索。
-*   **纯静态**：无需后端数据库，直接部署在 GitHub Pages 上即可使用。
+## Background
+以最小化的前端堆栈构建个人收藏夹，使用 GitHub Pages 部署静态页面，并借助 GitHub Gist 充当远程 JSON 数据源，实现多端同步且无需独立后端。
 
-## 如何使用
+## Features
+- 卡片式信息层级与响应式布局
+- 即时搜索：支持子序列匹配与 Fuse.js 模糊容错
+- Gist 驱动的数据存储，兼顾稳定性与易用性
+- 通过模态框直接追加收藏并写回云端数据
 
-1.  打开网站主页。
-2.  在顶部的搜索框中输入关键词（如 "Google" 或 "搜索"）。
-3.  列表会自动过滤显示匹配的网站。
-4.  点击卡片即可在新标签页打开对应网站。
+## Usage
+1. 打开线上页面或本地预览。
+2. 在顶部搜索框输入网站名称、URL 或描述片段。
+3. 结果区会根据搜索模式即时过滤，点击任意卡片将在新标签页打开对应站点。
 
-## 如何添加新网站
+## Configuration
+- **数据源**：收藏数据托管于 GitHub Gist（JSON 数组）。
+- **鉴权**：首次添加收藏需在模态框配置 GitHub Personal Access Token，并授予 Gist 权限。
+- **字段规范**：每个收藏对象包含 `name`、`url`、可选的 `description`，所有值需满足有效的 JSON 格式。
 
-由于这是一个纯静态网站，数据存储在 GitHub Gist 上，以实现多端同步。要添加新的收藏，请按照以下步骤操作：
+## Development
+1. 克隆仓库并进入项目目录。
+2. 使用浏览器直接打开 [index.html](index.html) 即可预览。
+3. 静态资源位于 [style.css](style.css) 与 [script.js](script.js)。
 
-1.  访问你的数据源 Gist
-2.  点击 "Edit" 按钮。
-3.  在 JSON 数组中添加一个新的对象，格式如下：
+## Maintainers
+- Calvin Xia (@Calvin-Xia)
 
-```json
-    {
-        "name": "网站名称",
-        "url": "https://www.example.com",
-        "description": "这里是网站的简短描述（可选）"
-    },
-```
+## Contributing
+欢迎提交 Issue 与 Pull Request。贡献前请在本地验证搜索与收藏新增流程，以确保数据同步逻辑正常。
 
-**注意：** JSON 格式要求比 JavaScript 更严格，属性名必须用双引号包裹，且不能有尾随逗号。
-
-4.  点击 "Update public gist" 保存更改。
-5.  刷新你的收藏夹网站（可能需要等待几分钟缓存更新）。
-
-## 本地开发
-
-如果你想在本地运行和测试：
-
-1.  克隆此仓库到本地。
-2.  直接用浏览器打开 `index.html` 文件即可预览。
+## License
+本项目尚未指定开源许可证，保留所有权利。
