@@ -1,376 +1,1026 @@
+/* ============================================
+   Editorial / Magazine Style Favorites
+   优雅、精致、有品味的现代化收藏夹界面
+   ============================================ */
+
+/* ============================================
+   1. CSS 变量系统
+   ============================================ */
 :root {
-    --primary-color: #3498db;
-    --primary-color-dark: #2c82c5;
-    --accent-color: #6f42c1;
-    --bg-color: #f4f4f9;
-    --bg-color-alt: #ffffff;
-    --text-color: #2f3542;
-    --text-secondary: #6b7280;
-    --border-radius: 14px;
-    --card-radius: 18px;
-    --shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
-    --shadow-hover: 0 25px 50px rgba(15, 23, 42, 0.12);
-    --transition: 0.25s ease;
+  --bg-primary: #faf8f5;
+  --bg-secondary: #f5f2ed;
+  --bg-card: #ffffff;
+  
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --text-muted: #9a9a9a;
+  
+  --accent-primary: #c9a227;
+  --accent-secondary: #d4af37;
+  --accent-light: rgba(201, 162, 39, 0.1);
+  
+  --border-light: rgba(0, 0, 0, 0.06);
+  --border-medium: rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.12);
+  
+  --font-display: 'Crimson Pro', 'Noto Serif SC', Georgia, serif;
+  --font-body: 'DM Sans', 'Noto Sans SC', -apple-system, sans-serif;
+  
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.4s ease;
+  
+  --icon-search: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239a9a9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  --icon-search-focus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23c9a227' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+/* ============================================
+   2. 基础重置与全局样式
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(160deg, #eef2ff 0%, #f8fafc 45%, #ffffff 100%);
-    color: var(--text-color);
-    line-height: 1.65;
-    min-height: 100vh;
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  min-height: 100vh;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* ============================================
+   3. 背景装饰样式
+   ============================================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.bg-decoration {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.bg-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bg-blob-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.15) 0%, transparent 70%);
+  top: -200px;
+  right: -100px;
+  animation: float 20s ease-in-out infinite;
+}
+
+.bg-blob-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(180, 140, 60, 0.12) 0%, transparent 70%);
+  bottom: 10%;
+  left: -100px;
+  animation: float 25s ease-in-out infinite reverse;
+}
+
+.bg-blob-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.1) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 15s ease-in-out infinite;
+}
+
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* ============================================
+   4. 容器布局
+   ============================================ */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px 24px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  position: relative;
 }
 
+/* ============================================
+   5. Header 设计
+   ============================================ */
 header {
-    margin-bottom: 40px;
-    padding: 48px 32px;
-    border-radius: 28px;
-    background: linear-gradient(135deg, rgba(52, 152, 219, 0.18), rgba(111, 66, 193, 0.12));
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow);
+  margin-bottom: 48px;
+  padding: 56px 40px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.9) 0%, 
+    rgba(250, 248, 245, 0.95) 100%);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    var(--accent-primary) 0%, 
+    var(--accent-secondary) 50%, 
+    var(--accent-primary) 100%);
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.08) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 h1 {
-    margin-bottom: 22px;
-    color: var(--text-color);
-    font-size: clamp(2rem, 3vw, 2.6rem);
-    letter-spacing: 0.03em;
+  font-family: var(--font-display);
+  margin-bottom: 28px;
+  color: var(--text-primary);
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  position: relative;
 }
 
+h1::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--accent-primary);
+  margin-top: 16px;
+  border-radius: var(--radius-full);
+}
+
+/* ============================================
+   6. 搜索框设计
+   ============================================ */
 .search-box {
-    max-width: 640px;
-    margin: 0 auto;
-    position: relative;
+  max-width: 560px;
+  margin: 0 auto;
+  position: relative;
 }
 
 #searchInput {
-    width: 100%;
-    padding: 16px 54px 16px 24px;
-    font-size: 16px;
-    border: 2px solid transparent;
-    border-radius: 999px;
-    outline: none;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.35);
-    transition: box-shadow var(--transition), transform var(--transition);
+  width: 100%;
+  padding: 18px 56px 18px 24px;
+  font-size: 16px;
+  font-family: var(--font-body);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-full);
+  outline: none;
+  background-color: var(--bg-card);
+  background-image: var(--icon-search);
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 18px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  color: var(--text-primary);
+}
+
+#searchInput::placeholder {
+  color: var(--text-muted);
+}
+
+#searchInput:hover {
+  border-color: var(--border-medium);
 }
 
 #searchInput:focus {
-    box-shadow: inset 0 0 0 2px rgba(52, 152, 219, 0.5), 0 10px 25px rgba(37, 99, 235, 0.15);
-    transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  background-image: var(--icon-search-focus);
+  box-shadow: 
+    0 0 0 4px var(--accent-light),
+    var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .search-options {
-    margin-top: 14px;
-    display: flex;
-    justify-content: center;
-    gap: 18px;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 .checkbox-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--text-secondary);
-    user-select: none;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-secondary);
+  user-select: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.6);
+  transition: all var(--transition-fast);
 }
 
-.checkbox-label input {
-    margin-right: 6px;
-    cursor: pointer;
+.checkbox-label:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
 }
 
+.checkbox-label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  border: 2px solid var(--border-medium);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+  background: var(--bg-card);
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.checkbox-label input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+/* ============================================
+   7. 添加按钮设计
+   ============================================ */
 .add-btn {
-    margin-top: 26px;
-    padding: 10px 26px;
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    border: none;
-    color: #fff;
-    border-radius: 999px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    box-shadow: 0 15px 35px rgba(52, 152, 219, 0.25);
-    transition: transform var(--transition), box-shadow var(--transition);
+  margin-top: 28px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  border: none;
+  color: #fff;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: 15px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 
+    0 4px 16px rgba(201, 162, 39, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.add-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .add-btn:hover {
-    transform: translateY(-2px) scale(1.01);
-    box-shadow: 0 20px 40px rgba(111, 66, 193, 0.28);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 24px rgba(201, 162, 39, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
+.add-btn:hover::before {
+  left: 100%;
+}
+
+.add-btn:active {
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   8. 收藏卡片网格
+   ============================================ */
 .favorites-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 28px;
-    align-items: stretch;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  align-items: stretch;
 }
 
+/* ============================================
+   9. 收藏卡片设计
+   ============================================ */
 .favorite-card {
-    background: var(--bg-color-alt);
-    border-radius: var(--card-radius);
-    padding: 26px 24px;
-    box-shadow: var(--shadow);
-    transition: transform var(--transition), box-shadow var(--transition);
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    position: relative;
-    border: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 28px 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-base);
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.favorite-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 0;
+  background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+  transition: height var(--transition-base);
+  border-radius: 0 4px 4px 0;
 }
 
 .favorite-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-hover);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(201, 162, 39, 0.2);
+}
+
+.favorite-card:hover::before {
+  height: 100%;
+}
+
+.favorite-card:focus-visible {
+  outline: none;
+  box-shadow: 
+    0 0 0 3px var(--accent-light),
+    var(--shadow-md);
 }
 
 .card-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--primary-color-dark);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  transition: color var(--transition-fast);
+}
+
+.favorite-card:hover .card-title {
+  color: var(--accent-primary);
 }
 
 .card-url {
-    font-size: 14px;
-    color: var(--text-secondary);
-    word-break: break-all;
+  font-size: 13px;
+  color: var(--text-muted);
+  word-break: break-all;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  background: var(--bg-secondary);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
 }
 
 .card-desc {
-    margin-top: 6px;
-    font-size: 14px;
-    color: #4b5563;
-    line-height: 1.5;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  flex-grow: 1;
 }
 
+/* ============================================
+   10. 卡片入场动画
+   ============================================ */
+.favorite-card {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: cardReveal 0.5s ease forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes cardReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   11. 无结果提示
+   ============================================ */
 .no-results {
-    text-align: center;
-    font-size: 18px;
-    color: var(--text-secondary);
-    margin-top: 40px;
-    background: rgba(255, 255, 255, 0.75);
-    padding: 24px;
-    border-radius: 16px;
-    box-shadow: var(--shadow);
+  text-align: center;
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-top: 48px;
+  background: var(--bg-card);
+  padding: 40px 24px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
 }
 
-footer {
-    text-align: center;
-    margin-top: 60px;
-    color: var(--text-secondary);
-    font-size: 14px;
-    padding-top: 30px;
-    border-top: 1px solid rgba(148, 163, 184, 0.3);
+.no-results::before {
+  content: '🔍';
+  display: block;
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
 }
 
+/* ============================================
+   12. 主内容区
+   ============================================ */
 main {
-    margin-top: 48px;
+  margin-top: 48px;
 }
 
-/* Modal Styles */
+/* ============================================
+   13. 模态框设计
+   ============================================ */
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 100; 
-    left: 0;
-    top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.5); 
-    backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(26, 26, 26, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.active {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 8% auto; 
-    padding: 34px 36px;
-    border: none;
-    width: min(92%, 520px);
-    border-radius: 22px;
-    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.2);
-    position: relative;
+  background: var(--bg-card);
+  margin: 24px;
+  padding: 40px 36px;
+  border: none;
+  width: min(92%, 480px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  animation: modalSlideUp 0.4s ease;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .close-btn {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 1;
+  color: var(--text-muted);
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  font-size: 28px;
+  font-weight: 300;
+  cursor: pointer;
+  line-height: 1;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  background: transparent;
 }
 
-.close-btn:hover,
-.close-btn:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
+.close-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.close-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .modal h2 {
-    margin-bottom: 20px;
-    font-size: 20px;
-    color: #333;
+  font-family: var(--font-display);
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
+/* ============================================
+   14. 表单设计
+   ============================================ */
 .form-group {
-    margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    font-size: 14px;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
 }
 
-.modal input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid rgba(148, 163, 184, 0.45);
-    border-radius: 10px;
-    font-size: 14px;
-    transition: border-color var(--transition), box-shadow var(--transition);
+.modal input[type="text"],
+.modal input[type="url"],
+.modal input[type="password"] {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: var(--font-body);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
 }
 
-.primary-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 14px;
-    transition: transform var(--transition), box-shadow var(--transition);
-    box-shadow: 0 18px 40px rgba(52, 152, 219, 0.25);
+.modal input::placeholder {
+  color: var(--text-muted);
 }
 
-.primary-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 24px 45px rgba(111, 66, 193, 0.3);
-}
-
-.primary-btn:disabled {
-    background: linear-gradient(135deg, #cbd5f5, #d1cff5);
-    cursor: not-allowed;
-}
-
-.tip {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 15px;
-}
-
-.small-tip {
-    font-size: 12px;
-    margin-top: 10px;
-    text-align: center;
-}
-
-.small-tip a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.form-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-}
-
-.text-btn {
-    background: none;
-    border: none;
-    color: #999;
-    font-size: 12px;
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.text-btn:hover {
-    color: #666;
-}
-
-#statusMsg {
-    font-size: 13px;
-    color: #666;
+.modal input:hover {
+  border-color: var(--border-medium);
 }
 
 .modal input:focus {
-    border-color: rgba(52, 152, 219, 0.7);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
-    outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px var(--accent-light);
+  outline: none;
 }
 
+/* ============================================
+   15. 按钮设计
+   ============================================ */
+.primary-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 16px rgba(201, 162, 39, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201, 162, 39, 0.4);
+}
+
+.primary-btn:hover::before {
+  left: 100%;
+}
+
+.primary-btn:active {
+  transform: translateY(0);
+}
+
+.primary-btn:disabled {
+  background: linear-gradient(135deg, #d4d4d4, #e5e5e5);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.primary-btn:disabled::before {
+  display: none;
+}
+
+.primary-btn:focus-visible {
+  outline: none;
+  box-shadow: 
+    0 0 0 3px var(--accent-light),
+    0 4px 16px rgba(201, 162, 39, 0.3);
+}
+
+/* ============================================
+   16. 提示文本
+   ============================================ */
+.tip {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.6;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent-primary);
+}
+
+.small-tip {
+  font-size: 13px;
+  margin-top: 16px;
+  text-align: center;
+}
+
+.small-tip a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+  border-bottom: 1px solid transparent;
+}
+
+.small-tip a:hover {
+  color: var(--accent-secondary);
+  border-bottom-color: var(--accent-secondary);
+}
+
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.text-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.text-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+#statusMsg {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   17. 页脚设计
+   ============================================ */
+footer {
+  text-align: center;
+  margin-top: 80px;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-light);
+}
+
+footer p {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+/* ============================================
+   18. 焦点状态 (无障碍)
+   ============================================ */
 .add-btn:focus-visible,
-.primary-btn:focus-visible,
-.text-btn:focus-visible,
-.close-btn:focus-visible,
-#searchInput:focus-visible,
-.checkbox-label input:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.35);
-    border-radius: 50px;
+#searchInput:focus-visible {
+  outline: none;
+  box-shadow: 
+    0 0 0 3px var(--accent-light),
+    var(--shadow-md);
 }
 
-@media (max-width: 600px) {
-    .container {
-        padding: 16px 14px 40px;
-    }
+/* ============================================
+   19. 响应式设计
+   ============================================ */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 16px 60px;
+  }
 
-    header {
-        padding: 36px 18px;
-        border-radius: 22px;
-    }
+  header {
+    padding: 40px 24px;
+    border-radius: var(--radius-md);
+  }
 
-    #searchInput {
-        padding: 14px 46px 14px 18px;
-        font-size: 15px;
-    }
+  h1 {
+    font-size: 1.8rem;
+  }
 
-    .add-btn {
-        width: 100%;
-        margin-top: 24px;
-    }
+  h1::after {
+    width: 48px;
+  }
 
-    .favorites-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
+  #searchInput {
+    padding: 16px 50px 16px 20px;
+    font-size: 15px;
+  }
 
-    .favorite-card {
-        padding: 22px 20px;
-    }
+  .search-options {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
 
-    .modal-content {
-        margin: 20% auto;
-        padding: 26px 24px;
-    }
+  .checkbox-label {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .add-btn {
+    width: 100%;
+    margin-top: 24px;
+  }
+
+  .favorites-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .favorite-card {
+    padding: 24px 20px;
+  }
+
+  .card-title {
+    font-size: 18px;
+  }
+
+  .modal-content {
+    margin: 16px;
+    padding: 32px 24px;
+  }
+
+  .modal h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .form-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .text-btn {
+    text-align: center;
+  }
+
+  .bg-blob-1,
+  .bg-blob-2,
+  .bg-blob-3 {
+    display: none;
+  }
 }
 
+@media (max-width: 480px) {
+  header {
+    padding: 32px 20px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .modal-content {
+    padding: 28px 20px;
+  }
+
+  .close-btn {
+    top: 16px;
+    right: 16px;
+  }
+}
+
+/* ============================================
+   20. 无障碍支持 - 减少动画
+   ============================================ */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        transition-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-    }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .favorite-card {
+    opacity: 1;
+    transform: none;
+  }
+
+  .bg-blob-1,
+  .bg-blob-2,
+  .bg-blob-3 {
+    animation: none;
+  }
+
+  .bg-blob {
+    filter: none;
+    opacity: 0.2;
+  }
+}
+
+/* ============================================
+   21. 打印样式
+   ============================================ */
+@media print {
+  .bg-decoration,
+  .bg-blob,
+  .bg-grid,
+  .add-btn,
+  .search-box,
+  .modal {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  header {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .favorite-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* ============================================
+   22. 滚动条美化
+   ============================================ */
+
+/* Firefox 滚动条支持 */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) var(--bg-secondary);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ============================================
+   23. 选中文本样式
+   ============================================ */
+::selection {
+  background: var(--accent-light);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background: var(--accent-light);
+  color: var(--text-primary);
 }

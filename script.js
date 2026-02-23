@@ -282,12 +282,12 @@ class ModalController {
     }
 
     open() {
-        this.modal.style.display = 'block';
+        this.modal.classList.add('active');
         this.resetStatus();
     }
 
     close() {
-        this.modal.style.display = 'none';
+        this.modal.classList.remove('active');
         this.resetStatus();
     }
 
