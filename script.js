@@ -1,37 +1,146 @@
+/**
+ * @typedef {Object} FavoriteItem
+ * @property {string} name - 网站名称
+ * @property {string} url - 网站地址
+ * @property {string} [description] - 可选的描述
+ */
+
+/**
+ * @typedef {Object} GistConfig
+ * @property {string} owner - Gist 所有者
+ * @property {string} id - Gist ID
+ * @property {string} filename - 文件名
+ */
+
+/**
+ * @typedef {Object} FormPayload
+ * @property {string} name - 名称
+ * @property {string} url - 网址
+ * @property {string} description - 描述
+ */
+
+/**
+ * @typedef {Object} ModalElements
+ * @property {HTMLElement} modal - 模态框容器
+ * @property {HTMLElement} openBtn - 打开按钮
+ * @property {HTMLElement} closeBtn - 关闭按钮
+ * @property {HTMLElement} tokenSection - Token 输入区域
+ * @property {HTMLInputElement} tokenInput - Token 输入框
+ * @property {HTMLElement} saveTokenBtn - 保存 Token 按钮
+ * @property {HTMLElement} clearTokenBtn - 清除 Token 按钮
+ * @property {HTMLFormElement} addForm - 添加表单
+ * @property {HTMLElement} statusMsg - 状态消息元素
+ * @property {HTMLElement} submitBtn - 提交按钮
+ */
+
+/**
+ * @typedef {Object} AppState
+ * @property {FavoriteItem[]} favorites - 收藏列表
+ * @property {string} token - GitHub Token
+ */
+
+/**
+ * @typedef {Object} FavoritesAppOptions
+ * @property {FavoritesService} service - 收藏服务
+ * @property {Object} storage - 存储对象
+ * @property {FavoritesView} view - 视图对象
+ * @property {HTMLInputElement} searchInput - 搜索输入框
+ * @property {HTMLInputElement} exactMatchCheckbox - 精确匹配复选框
+ * @property {ModalController} modal - 模态框控制器
+ */
+
+/**
+ * @typedef {Object} ModalCallbacks
+ * @property {Function} [onOpen] - 打开回调
+ * @property {Function} [onClose] - 关闭回调
+ * @property {Function} [onSaveToken] - 保存 Token 回调
+ * @property {Function} [onClearToken] - 清除 Token 回调
+ * @property {Function} [onSubmit] - 提交回调
+ */
+
+/**
+ * Gist 配置常量
+ * @type {Readonly<GistConfig>}
+ */
 const GIST_CONFIG = Object.freeze({
     owner: 'Calvin-Xia',
     id: '9c84112f9a5affcc63d4693a6282f74f',
     filename: 'data.json'
 });
 
+/**
+ * Token 存储管理器
+ * @type {Object}
+ * @property {string} key - localStorage 存储键名
+ */
 const TokenStorage = {
+    /** @type {string} */
     key: 'github_token',
+
+    /**
+     * 获取存储的 Token
+     * @returns {string} Token 值，不存在则返回空字符串
+     */
     get() {
         return localStorage.getItem(this.key) || '';
     },
+
+    /**
+     * 保存 Token 到 localStorage
+     * @param {string} token - 要保存的 Token
+     * @returns {void}
+     */
     set(token) {
         localStorage.setItem(this.key, token);
     },
+
+    /**
+     * 清除存储的 Token
+     * @returns {void}
+     */
     clear() {
         localStorage.removeItem(this.key);
     }
 };
 
+/**
+ * 收藏夹服务 - 处理 GitHub Gist API 交互
+ */
 class FavoritesService {
+    /**
+     * @param {GistConfig} config - Gist 配置
+     */
     constructor(config) {
+        /** @type {string} */
         this.owner = config.owner;
+        /** @type {string} */
         this.gistId = config.id;
+        /** @type {string} */
         this.filename = config.filename;
     }
 
+    /**
+     * 构建数据获取 URL
+     * @returns {string} 数据文件 URL
+     */
     buildDataUrl() {
         return `https://gist.githubusercontent.com/${this.owner}/${this.gistId}/raw/${this.filename}`;
     }
 
+    /**
+     * 构建 API URL
+     * @returns {string} Gist API URL
+     */
     buildApiUrl() {
         return `https://api.github.com/gists/${this.gistId}`;
     }
 
+    /**
+     * 获取所有收藏数据
+     * @param {AbortSignal} signal - 中断信号
+     * @returns {Promise<FavoriteItem[]>} 收藏列表
+     * @throws {Error} HTTP 请求失败时抛出错误
+     */
     async fetchAll(signal) {
         const url = `${this.buildDataUrl()}?t=${Date.now()}`;
         const response = await fetch(url, { signal });
@@ -41,6 +150,13 @@ class FavoritesService {
         return response.json();
     }
 
+    /**
+     * 追加新收藏项到 Gist
+     * @param {FavoriteItem} item - 要追加的收藏项
+     * @param {string} token - GitHub Token
+     * @returns {Promise<void>}
+     * @throws {Error} Token 无效或请求失败时抛出错误
+     */
     async append(item, token) {
         if (!token) {
             throw new Error('缺少访问 Token');
@@ -53,6 +169,12 @@ class FavoritesService {
         await this.updateGist(list, token);
     }
 
+    /**
+     * 获取 Gist 信息
+     * @param {string} token - GitHub Token
+     * @returns {Promise<Object>} Gist 对象
+     * @throws {Error} 请求失败时抛出错误
+     */
     async fetchGist(token) {
         const response = await fetch(this.buildApiUrl(), {
             headers: {
@@ -67,6 +189,12 @@ class FavoritesService {
         return response.json();
     }
 
+    /**
+     * 解析内容为 JSON 数组
+     * @param {string} content - 要解析的内容
+     * @returns {FavoriteItem[]} 解析后的数组
+     * @throws {Error} 内容不是有效的 JSON 数组时抛出错误
+     */
     parseContent(content) {
         try {
             const parsed = JSON.parse(content);
@@ -79,6 +207,13 @@ class FavoritesService {
         }
     }
 
+    /**
+     * 更新 Gist 内容
+     * @param {FavoriteItem[]} updatedList - 更新后的列表
+     * @param {string} token - GitHub Token
+     * @returns {Promise<void>}
+     * @throws {Error} 更新失败时抛出错误
+     */
     async updateGist(updatedList, token) {
         const response = await fetch(this.buildApiUrl(), {
             method: 'PATCH',
@@ -101,20 +236,46 @@ class FavoritesService {
     }
 }
 
+/**
+ * 收藏夹视图 - 处理 DOM 渲染
+ */
 class FavoritesView {
+    /**
+     * @param {Object} options - 视图选项
+     * @param {HTMLElement} options.listEl - 列表容器元素
+     * @param {HTMLElement} options.emptyEl - 空状态元素
+     */
     constructor({ listEl, emptyEl }) {
+        /** @type {HTMLElement} */
         this.listEl = listEl;
+        /** @type {HTMLElement} */
         this.emptyEl = emptyEl;
     }
 
+    /**
+     * 显示加载状态
+     * @param {string} [message='正在从云端加载收藏夹...'] - 加载消息
+     * @returns {void}
+     */
     showLoading(message = '正在从云端加载收藏夹...') {
         this.showMessage(message, '#666');
     }
 
+    /**
+     * 显示错误状态
+     * @param {string} message - 错误消息
+     * @returns {void}
+     */
     showError(message) {
         this.showMessage(message, '#e74c3c');
     }
 
+    /**
+     * 显示消息
+     * @param {string} message - 消息内容
+     * @param {string} color - 文字颜色
+     * @returns {void}
+     */
     showMessage(message, color) {
         this.listEl.style.display = 'grid';
         this.listEl.innerHTML = '';
@@ -129,6 +290,11 @@ class FavoritesView {
         this.listEl.appendChild(wrapper);
     }
 
+    /**
+     * 渲染收藏列表
+     * @param {FavoriteItem[]} items - 要渲染的收藏项
+     * @returns {void}
+     */
     render(items) {
         this.listEl.innerHTML = '';
 
@@ -146,6 +312,11 @@ class FavoritesView {
         });
     }
 
+    /**
+     * 构建卡片元素
+     * @param {FavoriteItem} item - 收藏项数据
+     * @returns {HTMLAnchorElement} 卡片元素
+     */
     buildCard(item) {
         const card = document.createElement('a');
         card.className = 'favorite-card';
@@ -175,17 +346,36 @@ class FavoritesView {
     }
 }
 
+/**
+ * 搜索引擎 - 支持精确匹配和模糊搜索
+ */
 class SearchEngine {
+    /**
+     * @param {FavoriteItem[]} [data=[]] - 初始数据
+     */
     constructor(data = []) {
+        /** @type {FavoriteItem[]} */
         this.data = data;
+        /** @type {Object|null} */
         this.fuse = null;
     }
 
+    /**
+     * 更新数据源
+     * @param {FavoriteItem[]} data - 新数据源
+     * @returns {void}
+     */
     updateSource(data) {
         this.data = Array.isArray(data) ? data : [];
         this.fuse = null;
     }
 
+    /**
+     * 过滤搜索结果
+     * @param {string} term - 搜索词
+     * @param {'exact'|'fuzzy'} mode - 搜索模式
+     * @returns {FavoriteItem[]} 过滤后的结果
+     */
     filter(term, mode) {
         const query = term.trim().toLowerCase();
         if (!query) {
@@ -203,6 +393,11 @@ class SearchEngine {
         return fuse.search(query).map((result) => result.item);
     }
 
+    /**
+     * 确保 Fuse 实例已初始化
+     * @returns {Object} Fuse 实例
+     * @throws {Error} Fuse.js 未加载时抛出错误
+     */
     ensureFuse() {
         if (!this.fuse) {
             if (typeof Fuse === 'undefined') {
@@ -218,6 +413,12 @@ class SearchEngine {
         return this.fuse;
     }
 
+    /**
+     * 判断 source 是否为 target 的子序列
+     * @param {string} source - 源字符串
+     * @param {string} target - 目标字符串
+     * @returns {boolean} 是否为子序列
+     */
     static isSubsequence(source, target) {
         let i = 0;
         let j = 0;
@@ -233,20 +434,41 @@ class SearchEngine {
     }
 }
 
+/**
+ * 模态框控制器
+ */
 class ModalController {
+    /**
+     * @param {ModalElements} elements - DOM 元素引用
+     */
     constructor(elements) {
+        /** @type {HTMLElement} */
         this.modal = elements.modal;
+        /** @type {HTMLElement} */
         this.openBtn = elements.openBtn;
+        /** @type {HTMLElement} */
         this.closeBtn = elements.closeBtn;
+        /** @type {HTMLElement} */
         this.tokenSection = elements.tokenSection;
+        /** @type {HTMLInputElement} */
         this.tokenInput = elements.tokenInput;
+        /** @type {HTMLElement} */
         this.saveTokenBtn = elements.saveTokenBtn;
+        /** @type {HTMLElement} */
         this.clearTokenBtn = elements.clearTokenBtn;
+        /** @type {HTMLFormElement} */
         this.addForm = elements.addForm;
+        /** @type {HTMLElement} */
         this.statusMsg = elements.statusMsg;
+        /** @type {HTMLElement} */
         this.submitBtn = elements.submitBtn;
     }
 
+    /**
+     * 初始化模态框事件
+     * @param {ModalCallbacks} options - 回调函数配置
+     * @returns {void}
+     */
     init({ onOpen, onClose, onSaveToken, onClearToken, onSubmit }) {
         this.openBtn.addEventListener('click', () => {
             this.open();
@@ -281,16 +503,28 @@ class ModalController {
         });
     }
 
+    /**
+     * 打开模态框
+     * @returns {void}
+     */
     open() {
         this.modal.classList.add('active');
         this.resetStatus();
     }
 
+    /**
+     * 关闭模态框
+     * @returns {void}
+     */
     close() {
         this.modal.classList.remove('active');
         this.resetStatus();
     }
 
+    /**
+     * 序列化表单数据
+     * @returns {FormPayload} 表单数据
+     */
     serializeForm() {
         return {
             name: this.addForm.querySelector('#siteName')?.value.trim() ?? '',
@@ -299,10 +533,19 @@ class ModalController {
         };
     }
 
+    /**
+     * 重置表单
+     * @returns {void}
+     */
     resetForm() {
         this.addForm.reset();
     }
 
+    /**
+     * 同步 Token 状态显示
+     * @param {boolean} hasToken - 是否有 Token
+     * @returns {void}
+     */
     syncTokenState(hasToken) {
         if (hasToken) {
             this.tokenSection.style.display = 'none';
@@ -313,43 +556,82 @@ class ModalController {
         }
     }
 
+    /**
+     * 设置保存状态
+     * @param {boolean} isSaving - 是否正在保存
+     * @returns {void}
+     */
     setSavingState(isSaving) {
         this.submitBtn.disabled = isSaving;
         this.submitBtn.textContent = isSaving ? '正在保存...' : '保存到 Gist';
     }
 
+    /**
+     * 显示状态消息
+     * @param {string} message - 消息内容
+     * @param {'info'|'error'} [type='info'] - 消息类型
+     * @returns {void}
+     */
     showStatus(message, type = 'info') {
         this.statusMsg.textContent = message;
         this.statusMsg.style.color = type === 'error' ? '#e74c3c' : '#666';
     }
 
+    /**
+     * 重置状态消息
+     * @returns {void}
+     */
     resetStatus() {
         this.showStatus('');
     }
 
-    fillToken(token) {
+    /**
+     * 填充 Token 输入框
+     * @param {string} [token=''] - Token 值
+     * @returns {void}
+     */
+    fillToken(token = '') {
         this.tokenInput.value = token ?? '';
     }
 }
 
+/**
+ * 收藏夹应用主控制器
+ */
 class FavoritesApp {
+    /**
+     * @param {FavoritesAppOptions} options - 应用配置
+     */
     constructor({ service, storage, view, searchInput, exactMatchCheckbox, modal }) {
+        /** @type {FavoritesService} */
         this.service = service;
+        /** @type {Object} */
         this.storage = storage;
+        /** @type {FavoritesView} */
         this.view = view;
+        /** @type {HTMLInputElement} */
         this.searchInput = searchInput;
+        /** @type {HTMLInputElement} */
         this.exactMatchCheckbox = exactMatchCheckbox;
+        /** @type {ModalController} */
         this.modal = modal;
 
+        /** @type {AppState} */
         this.state = {
             favorites: [],
             token: storage.get()
         };
 
+        /** @type {SearchEngine} */
         this.searchEngine = new SearchEngine();
+        /** @type {AbortController|null} */
         this.abortController = null;
     }
 
+    /**
+     * 初始化应用
+     * @returns {void}
+     */
     init() {
         this.view.showLoading();
         this.bindSearch();
@@ -357,6 +639,10 @@ class FavoritesApp {
         this.loadFavorites();
     }
 
+    /**
+     * 绑定搜索事件
+     * @returns {void}
+     */
     bindSearch() {
         const triggerSearch = () => {
             this.applySearch();
@@ -366,6 +652,10 @@ class FavoritesApp {
         this.exactMatchCheckbox.addEventListener('change', triggerSearch);
     }
 
+    /**
+     * 设置模态框
+     * @returns {void}
+     */
     setupModal() {
         this.modal.init({
             onOpen: () => {
@@ -404,8 +694,11 @@ class FavoritesApp {
         this.modal.syncTokenState(Boolean(this.state.token));
     }
 
+    /**
+     * 加载收藏数据
+     * @returns {Promise<void>}
+     */
     async loadFavorites() {
-        // 防止重复请求堆叠，按需中断旧请求
         this.abortController?.abort();
         this.abortController = new AbortController();
 
@@ -424,6 +717,11 @@ class FavoritesApp {
         }
     }
 
+    /**
+     * 应用搜索过滤
+     * @param {boolean} [forceFullRender=false] - 是否强制完整渲染
+     * @returns {void}
+     */
     applySearch(forceFullRender = false) {
         const term = this.searchInput.value ?? '';
         const mode = this.exactMatchCheckbox.checked ? 'exact' : 'fuzzy';
@@ -442,6 +740,11 @@ class FavoritesApp {
         }
     }
 
+    /**
+     * 处理创建收藏
+     * @param {FormPayload} payload - 表单数据
+     * @returns {Promise<void>}
+     */
     async handleCreateFavorite(payload) {
         const sanitized = {
             name: payload.name.trim(),
@@ -451,6 +754,23 @@ class FavoritesApp {
 
         if (!sanitized.name || !sanitized.url) {
             this.modal.showStatus('名称和网址不能为空', 'error');
+            return;
+        }
+
+        try {
+            new URL(sanitized.url);
+        } catch (e) {
+            this.modal.showStatus('请输入有效的网址（需以 http:// 或 https:// 开头）', 'error');
+            return;
+        }
+
+        if (sanitized.name.length > 100) {
+            this.modal.showStatus('名称不能超过 100 个字符', 'error');
+            return;
+        }
+
+        if (sanitized.description.length > 500) {
+            this.modal.showStatus('描述不能超过 500 个字符', 'error');
             return;
         }
 
@@ -476,6 +796,16 @@ class FavoritesApp {
         }
     }
 }
+
+window.addEventListener('error', (event) => {
+    console.error('全局错误:', event.error);
+    alert('应用发生错误，请刷新页面重试');
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('未处理的 Promise 错误:', event.reason);
+    alert('应用发生错误，请刷新页面重试');
+});
 
 window.addEventListener('DOMContentLoaded', () => {
     const favoritesList = document.getElementById('favoritesList');
