@@ -24,33 +24,7 @@ function assertIncludes(str, substr) {
     }
 }
 
-class FavoritesService {
-    constructor(config) {
-        this.owner = config.owner;
-        this.gistId = config.id;
-        this.filename = config.filename;
-    }
-
-    buildDataUrl() {
-        return `https://gist.githubusercontent.com/${this.owner}/${this.gistId}/raw/${this.filename}`;
-    }
-
-    buildApiUrl() {
-        return `https://api.github.com/gists/${this.gistId}`;
-    }
-
-    parseContent(content) {
-        try {
-            const parsed = JSON.parse(content);
-            if (!Array.isArray(parsed)) {
-                throw new Error();
-            }
-            return parsed;
-        } catch (err) {
-            throw new Error('云端数据不是有效的列表 JSON');
-        }
-    }
-}
+const { FavoritesService } = require('../script.js');
 
 test('buildDataUrl: 生成正确的数据 URL', () => {
     const service = new FavoritesService({
@@ -110,7 +84,7 @@ test('parseContent: 解析空数组', () => {
 
 test('parseContent: 解析多个元素的数组', () => {
     const service = new FavoritesService({});
-    const result = service.parseContent('[{"name":"a"},{"name":"b"},{"name":"c"}]');
+    const result = service.parseContent('[{"name":"a","url":"http://a.com"},{"name":"b","url":"http://b.com"},{"name":"c","url":"http://c.com"}]');
     assertEqual(result.length, 3);
 });
 

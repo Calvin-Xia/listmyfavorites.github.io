@@ -30,47 +30,7 @@ function assertFalse(value) {
     }
 }
 
-class SearchEngine {
-    constructor(data = []) {
-        this.data = data;
-        this.fuse = null;
-    }
-
-    updateSource(data) {
-        this.data = Array.isArray(data) ? data : [];
-        this.fuse = null;
-    }
-
-    filter(term, mode) {
-        const query = term.trim().toLowerCase();
-        if (!query) {
-            return this.data;
-        }
-
-        if (mode === 'exact') {
-            return this.data.filter((item) => {
-                const target = `${item.name ?? ''} ${item.url ?? ''} ${item.description ?? ''}`.toLowerCase();
-                return SearchEngine.isSubsequence(query, target);
-            });
-        }
-
-        throw new Error('Fuse.js 未加载');
-    }
-
-    static isSubsequence(source, target) {
-        let i = 0;
-        let j = 0;
-
-        while (i < source.length && j < target.length) {
-            if (source[i] === target[j]) {
-                i += 1;
-            }
-            j += 1;
-        }
-
-        return i === source.length;
-    }
-}
+const { SearchEngine } = require('../script.js');
 
 test('isSubsequence: 正确匹配子序列', () => {
     assertTrue(SearchEngine.isSubsequence('gh', 'github'));

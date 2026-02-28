@@ -76,13 +76,19 @@ const GIST_CONFIG = Object.freeze({
 const TokenStorage = {
     /** @type {string} */
     key: 'github_token',
+    _fallback: '',
 
+    /**
     /**
      * 获取存储的 Token
      * @returns {string} Token 值，不存在则返回空字符串
      */
     get() {
-        return localStorage.getItem(this.key) || '';
+        try {
+            return localStorage.getItem(this.key) || '';
+        } catch (err) {
+            return this._fallback;
+        }
     },
 
     /**
@@ -91,7 +97,11 @@ const TokenStorage = {
      * @returns {void}
      */
     set(token) {
-        localStorage.setItem(this.key, token);
+        try {
+            localStorage.setItem(this.key, token);
+        } catch (err) {
+            this._fallback = token;
+        }
     },
 
     /**
@@ -99,7 +109,11 @@ const TokenStorage = {
      * @returns {void}
      */
     clear() {
-        localStorage.removeItem(this.key);
+        try {
+            localStorage.removeItem(this.key);
+        } catch (err) {
+            this._fallback = '';
+        }
     }
 };
 
@@ -117,6 +131,8 @@ class FavoritesService {
         this.gistId = config.id;
         /** @type {string} */
         this.filename = config.filename;
+        /** @type {boolean} */
+        this.isUpdating = false;
     }
 
     /**
@@ -161,12 +177,20 @@ class FavoritesService {
         if (!token) {
             throw new Error('缺少访问 Token');
         }
+        if (this.isUpdating) {
+            throw new Error('正在保存中，请稍后再试');
+        }
+        this.isUpdating = true;
 
-        const gist = await this.fetchGist(token);
-        const rawContent = gist.files?.[this.filename]?.content ?? '[]';
-        const list = this.parseContent(rawContent);
-        list.push(item);
-        await this.updateGist(list, token);
+        try {
+            const gist = await this.fetchGist(token);
+            const rawContent = gist.files?.[this.filename]?.content ?? '[]';
+            const list = this.parseContent(rawContent);
+            list.push(item);
+            await this.updateGist(list, token);
+        } finally {
+            this.isUpdating = false;
+        }
     }
 
     /**
@@ -201,7 +225,7 @@ class FavoritesService {
             if (!Array.isArray(parsed)) {
                 throw new Error();
             }
-            return parsed;
+            return parsed.filter(item => item && typeof item.url === 'string' && typeof item.name === 'string');
         } catch (err) {
             throw new Error('云端数据不是有效的列表 JSON');
         }
@@ -307,9 +331,11 @@ class FavoritesView {
         this.listEl.style.display = 'grid';
         this.emptyEl.style.display = 'none';
 
+        const fragment = document.createDocumentFragment();
         items.forEach((item) => {
-            this.listEl.appendChild(this.buildCard(item));
+            fragment.appendChild(this.buildCard(item));
         });
+        this.listEl.appendChild(fragment);
     }
 
     /**
@@ -320,7 +346,18 @@ class FavoritesView {
     buildCard(item) {
         const card = document.createElement('a');
         card.className = 'favorite-card';
-        card.href = item.url;
+        
+        let safeUrl = '#';
+        try {
+            const urlObj = new URL(item.url);
+            if (urlObj.protocol === 'http:' || urlObj.protocol === 'https:') {
+                safeUrl = item.url;
+            }
+        } catch (e) {
+            // Invalid URL fallback
+        }
+
+        card.href = safeUrl;
         card.target = '_blank';
         card.rel = 'noopener noreferrer';
 
@@ -758,7 +795,10 @@ class FavoritesApp {
         }
 
         try {
-            new URL(sanitized.url);
+            const urlObj = new URL(sanitized.url);
+            if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+                throw new Error('Invalid protocol');
+            }
         } catch (e) {
             this.modal.showStatus('请输入有效的网址（需以 http:// 或 https:// 开头）', 'error');
             return;
@@ -797,43 +837,80 @@ class FavoritesApp {
     }
 }
 
-window.addEventListener('error', (event) => {
-    console.error('全局错误:', event.error);
-    alert('应用发生错误，请刷新页面重试');
-});
+function showToast(message, type = 'error') {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.backgroundColor = type === 'error' ? '#e74c3c' : '#333';
+    toast.style.color = '#fff';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    toast.style.zIndex = '9999';
+    toast.style.fontFamily = 'inherit';
+    toast.style.fontSize = '14px';
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.transition = 'opacity 0.5s ease';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 500);
+    }, 3000);
+}
 
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('未处理的 Promise 错误:', event.reason);
-    alert('应用发生错误，请刷新页面重试');
-});
-
-window.addEventListener('DOMContentLoaded', () => {
-    const favoritesList = document.getElementById('favoritesList');
-    const noResults = document.getElementById('noResults');
-    const searchInput = document.getElementById('searchInput');
-    const exactMatchCheckbox = document.getElementById('exactMatch');
-
-    const modal = new ModalController({
-        modal: document.getElementById('modal'),
-        openBtn: document.getElementById('addBtn'),
-        closeBtn: document.querySelector('.close-btn'),
-        tokenSection: document.getElementById('tokenSection'),
-        tokenInput: document.getElementById('tokenInput'),
-        saveTokenBtn: document.getElementById('saveTokenBtn'),
-        clearTokenBtn: document.getElementById('clearTokenBtn'),
-        addForm: document.getElementById('addForm'),
-        statusMsg: document.getElementById('statusMsg'),
-        submitBtn: document.getElementById('submitBtn')
+if (typeof window !== 'undefined') {
+    window.addEventListener('error', (event) => {
+        console.error('全局错误:', event.error);
+        showToast('应用发生错误，请刷新页面重试: ' + (event.error?.message || '未知错误'));
     });
 
-    const app = new FavoritesApp({
-        service: new FavoritesService(GIST_CONFIG),
-        storage: TokenStorage,
-        view: new FavoritesView({ listEl: favoritesList, emptyEl: noResults }),
-        searchInput,
-        exactMatchCheckbox,
-        modal
+    window.addEventListener('unhandledrejection', (event) => {
+        console.error('未处理的 Promise 错误:', event.reason);
+        showToast('应用发生错误，请刷新页面重试: ' + (event.reason?.message || '未知错误'));
     });
 
-    app.init();
-});
+    window.addEventListener('DOMContentLoaded', () => {
+        const favoritesList = document.getElementById('favoritesList');
+        const noResults = document.getElementById('noResults');
+        const searchInput = document.getElementById('searchInput');
+        const exactMatchCheckbox = document.getElementById('exactMatch');
+
+        const modal = new ModalController({
+            modal: document.getElementById('modal'),
+            openBtn: document.getElementById('addBtn'),
+            closeBtn: document.querySelector('.close-btn'),
+            tokenSection: document.getElementById('tokenSection'),
+            tokenInput: document.getElementById('tokenInput'),
+            saveTokenBtn: document.getElementById('saveTokenBtn'),
+            clearTokenBtn: document.getElementById('clearTokenBtn'),
+            addForm: document.getElementById('addForm'),
+            statusMsg: document.getElementById('statusMsg'),
+            submitBtn: document.getElementById('submitBtn')
+        });
+
+        const app = new FavoritesApp({
+            service: new FavoritesService(GIST_CONFIG),
+            storage: TokenStorage,
+            view: new FavoritesView({ listEl: favoritesList, emptyEl: noResults }),
+            searchInput,
+            exactMatchCheckbox,
+            modal
+        });
+
+        app.init();
+    });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        FavoritesService,
+        FavoritesView,
+        SearchEngine,
+        ModalController,
+        FavoritesApp,
+        TokenStorage,
+        GIST_CONFIG
+    };
+}
