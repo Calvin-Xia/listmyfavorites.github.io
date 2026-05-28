@@ -926,9 +926,10 @@ class ModalController {
         this.modal.addEventListener('keydown', this._focusTrapHandler);
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                const focusTarget = this.tokenSection.style.display !== 'none'
-                    ? this.tokenInput
-                    : this.modal.querySelector('#siteName');
+                const focusTarget =
+                    this.tokenSection.style.display !== 'none'
+                        ? this.tokenInput
+                        : this.modal.querySelector('#siteName');
                 if (focusTarget) focusTarget.focus();
             });
         });
@@ -1492,9 +1493,10 @@ function showToast(message, type = 'error') {
     toast.setAttribute('aria-live', 'polite');
     toast.setAttribute('role', 'status');
 
-    const iconSvg = type === 'error'
-        ? '<svg class="toast__icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
-        : '<svg class="toast__icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    const iconSvg =
+        type === 'error'
+            ? '<svg class="toast__icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+            : '<svg class="toast__icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
 
     toast.innerHTML = iconSvg + `<span>${message}</span>`;
 
@@ -1542,7 +1544,8 @@ if (typeof window !== 'undefined') {
             document.querySelector('h1').textContent = LanguageManager.t('title');
             document.getElementById('exactMatchLabel').textContent = LanguageManager.t('exactSearch');
             document.getElementById('noResults').textContent = LanguageManager.t('noResults');
-            document.getElementById('offlineBanner').querySelector('span').textContent = LanguageManager.t('offlineMsg');
+            document.getElementById('offlineBanner').querySelector('span').textContent =
+                LanguageManager.t('offlineMsg');
             document.querySelector('footer p').textContent = LanguageManager.t('copyright');
             document.getElementById('modalTitle').textContent = LanguageManager.t('modalTitle');
             document.getElementById('tokenLabel').textContent = LanguageManager.t('tokenTip');
@@ -1570,8 +1573,10 @@ if (typeof window !== 'undefined') {
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = themeToggle.querySelector('.theme-toggle__icon');
 
-        const moonSvg = '<svg class="icon-svg icon-svg--md" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-        const sunSvg = '<svg class="icon-svg icon-svg--md" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+        const moonSvg =
+            '<svg class="icon-svg icon-svg--md" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        const sunSvg =
+            '<svg class="icon-svg icon-svg--md" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
 
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
