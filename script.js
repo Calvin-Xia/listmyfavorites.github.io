@@ -338,7 +338,7 @@ class FavoritesService {
             } catch (error) {
                 if (attempt === maxRetries) throw error;
                 const delay = baseDelay * Math.pow(2, attempt);
-                await new Promise(resolve => setTimeout(resolve, delay));
+                await new Promise((resolve) => setTimeout(resolve, delay));
             }
         }
     }
@@ -437,7 +437,7 @@ class FavoritesService {
             if (!Array.isArray(parsed)) {
                 throw new Error();
             }
-            return parsed.filter(item => item && typeof item.url === 'string' && typeof item.name === 'string');
+            return parsed.filter((item) => item && typeof item.url === 'string' && typeof item.name === 'string');
         } catch (err) {
             throw new Error('云端数据不是有效的列表 JSON');
         }
@@ -478,7 +478,7 @@ class FavoritesService {
      */
     async findByUrl(url) {
         const list = await this.fetchAll(new AbortController().signal);
-        const index = list.findIndex(item => item.url === url);
+        const index = list.findIndex((item) => item.url === url);
         if (index === -1) return null;
         return { item: list[index], index };
     }
@@ -645,7 +645,7 @@ class FavoritesView {
     buildCard(item, index = 0, showActions = false) {
         const card = document.createElement('a');
         card.className = 'favorite-card';
-        
+
         let safeUrl = '#';
         try {
             const urlObj = new URL(item.url);
@@ -690,7 +690,7 @@ class FavoritesView {
         if (item.tags && item.tags.length > 0) {
             const tagsContainer = document.createElement('div');
             tagsContainer.className = 'card-tags';
-            item.tags.forEach(tag => {
+            item.tags.forEach((tag) => {
                 const pill = document.createElement('span');
                 pill.className = 'tag-pill';
                 pill.textContent = tag;
@@ -770,11 +770,11 @@ class SearchEngine {
         if (query.startsWith('#')) {
             const tagPart = query.slice(1).split(' ')[0].toLowerCase();
             const remainingQuery = query.slice(1 + tagPart.length).trim();
-            const tagMatches = this.data.filter(item =>
-                item.tags && item.tags.some(t => t.toLowerCase() === tagPart)
+            const tagMatches = this.data.filter(
+                (item) => item.tags && item.tags.some((t) => t.toLowerCase() === tagPart)
             );
             if (remainingQuery) {
-                return tagMatches.filter(item => {
+                return tagMatches.filter((item) => {
                     const target = `${item.name ?? ''} ${item.url ?? ''} ${item.description ?? ''}`.toLowerCase();
                     return target.includes(remainingQuery);
                 });
@@ -1187,7 +1187,12 @@ class FavoritesApp {
             }
             console.error('加载数据失败:', error);
             const type = this._classifyError(error);
-            const prefix = type === 'network' ? LanguageManager.t('networkError') : type === 'auth' ? LanguageManager.t('authError') : LanguageManager.t('loadFailed');
+            const prefix =
+                type === 'network'
+                    ? LanguageManager.t('networkError')
+                    : type === 'auth'
+                      ? LanguageManager.t('authError')
+                      : LanguageManager.t('loadFailed');
             this.view.showError(`${prefix}：${error.message}`);
         }
     }
@@ -1227,7 +1232,10 @@ class FavoritesApp {
             url: payload.url.trim(),
             description: payload.description.trim(),
             tags: payload.tags
-                ? payload.tags.split(',').map(t => t.trim()).filter(Boolean)
+                ? payload.tags
+                      .split(',')
+                      .map((t) => t.trim())
+                      .filter(Boolean)
                 : []
         };
 
@@ -1280,7 +1288,14 @@ class FavoritesApp {
         } catch (error) {
             console.error(isEdit ? '更新失败:' : '保存失败:', error);
             const type = this._classifyError(error);
-            const prefix = type === 'auth' ? LanguageManager.t('authError') : type === 'network' ? LanguageManager.t('networkError') : type === 'validation' ? LanguageManager.t('validationError') : LanguageManager.t('saveFailed');
+            const prefix =
+                type === 'auth'
+                    ? LanguageManager.t('authError')
+                    : type === 'network'
+                      ? LanguageManager.t('networkError')
+                      : type === 'validation'
+                        ? LanguageManager.t('validationError')
+                        : LanguageManager.t('saveFailed');
             this.modal.showStatus(`${prefix}：${error.message}`, 'error');
         } finally {
             this.modal.setSavingState(false);
@@ -1373,7 +1388,7 @@ class FavoritesApp {
             if (item.tags !== undefined && item.tags !== null) {
                 if (!Array.isArray(item.tags)) {
                     errors.push(`第 ${index + 1} 项标签格式无效（应为数组）`);
-                } else if (!item.tags.every(t => typeof t === 'string')) {
+                } else if (!item.tags.every((t) => typeof t === 'string')) {
                     errors.push(`第 ${index + 1} 项标签包含非字符串值`);
                 }
             }
@@ -1415,8 +1430,8 @@ class FavoritesApp {
                     showToast(`${LanguageManager.t('importValidationFail')}：${validation.errors[0]}`, 'error');
                     return;
                 }
-                const existingUrls = new Set(this.state.favorites.map(f => f.url));
-                const newItems = imported.filter(item => !existingUrls.has(item.url));
+                const existingUrls = new Set(this.state.favorites.map((f) => f.url));
+                const newItems = imported.filter((item) => !existingUrls.has(item.url));
                 if (newItems.length === 0) {
                     showToast(LanguageManager.t('importAllExists'), 'error');
                     return;
@@ -1559,7 +1574,9 @@ if (typeof window !== 'undefined') {
         const updateOnlineStatus = () => {
             if (navigator.onLine) {
                 offlineBanner.classList.remove('visible');
-                setTimeout(() => { offlineBanner.style.display = 'none'; }, 300);
+                setTimeout(() => {
+                    offlineBanner.style.display = 'none';
+                }, 300);
             } else {
                 offlineBanner.style.display = 'block';
                 requestAnimationFrame(() => offlineBanner.classList.add('visible'));
