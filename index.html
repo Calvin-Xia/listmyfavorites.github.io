@@ -32,7 +32,8 @@
 </head>
 <body>
     <div id="offlineBanner" class="offline-banner" style="display:none;">
-        ⚠️ 当前处于离线状态，显示的是缓存数据
+        <svg class="icon-svg icon-svg--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>当前处于离线状态，显示的是缓存数据</span>
     </div>
     <div class="bg-decoration" aria-hidden="true">
         <div class="bg-blob bg-blob-1"></div>
@@ -45,13 +46,16 @@
             <div class="header-decoration"></div>
             <h1>我的网络收藏夹</h1>
             <button id="themeToggle" class="theme-toggle" aria-label="切换深色模式" title="切换深色模式">
-                <span class="theme-toggle__icon">🌙</span>
+                <span class="theme-toggle__icon"><svg class="icon-svg icon-svg--md" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
             </button>
             <button id="langToggle" class="theme-toggle theme-toggle--lang" aria-label="Switch language" title="Switch language">
                 <span class="lang-toggle__text">EN</span>
             </button>
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="搜索网站名称或网址..." aria-label="搜索收藏夹">
+                <button id="searchClear" class="search-clear" aria-label="清除搜索" type="button">
+                    <svg class="icon-svg icon-svg--sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
                 <div class="search-options">
                     <label class="checkbox-label" title="勾选后：输入字符必须按顺序存在（如 'gh' 匹配 'GitHub'）&#10;不勾选：允许拼写错误（如 'gogle' 匹配 'Google'）">
                         <input type="checkbox" id="exactMatch" checked> <span id="exactMatchLabel">精确搜索 (顺序匹配)</span>

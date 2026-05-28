@@ -13,7 +13,7 @@
   
   --text-primary: #1a1a1a;
   --text-secondary: #6b6b6b;
-  --text-muted: #9a9a9a;
+  --text-muted: #767676;
   
   --accent-primary: #c9a227;
   --accent-secondary: #d4af37;
@@ -50,7 +50,7 @@
     --bg-card: #2a2a2a;
     --text-primary: #e8e8e8;
     --text-secondary: #a0a0a0;
-    --text-muted: #6b6b6b;
+    --text-muted: #8a8a8a;
     --border-light: rgba(255, 255, 255, 0.08);
     --border-medium: rgba(255, 255, 255, 0.12);
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -474,6 +474,7 @@ h1::after {
   position: relative;
   border: 1px solid var(--border-light);
   overflow: hidden;
+  cursor: pointer;
 }
 
 .favorite-card::before {
@@ -546,8 +547,10 @@ h1::after {
 }
 
 .tag-pill {
-  display: inline-block;
-  padding: 3px 10px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  min-height: 32px;
   font-size: 12px;
   font-family: var(--font-body);
   color: var(--accent-primary);
@@ -673,11 +676,15 @@ h1::after {
 }
 
 .no-results::before {
-  content: '🔍';
+  content: '';
   display: block;
-  font-size: 48px;
-  margin-bottom: 16px;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
   opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%23767676' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 /* ============================================
@@ -764,14 +771,14 @@ main {
 .close-btn {
   color: var(--text-muted);
   position: absolute;
-  top: 20px;
-  right: 24px;
+  top: 16px;
+  right: 20px;
   font-size: 28px;
   font-weight: 300;
   cursor: pointer;
   line-height: 1;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1259,6 +1266,15 @@ html {
     z-index: 9998;
     transform: translateY(-100%);
     transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.offline-banner .icon-svg {
+    stroke: #fff;
+    flex-shrink: 0;
 }
 
 .offline-banner.visible {
@@ -1282,6 +1298,94 @@ html {
   font-family: var(--font-body);
   font-size: 14px;
   transition: opacity 0.5s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast__icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+/* ============================================
+   26. 搜索框清除按钮
+   ============================================ */
+.search-clear {
+  position: absolute;
+  right: 56px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.search-clear:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.search-clear:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.search-clear.visible {
+  display: flex;
+}
+
+/* ============================================
+   27. SVG 图标基础样式
+   ============================================ */
+.icon-svg {
+  display: inline-block;
+  vertical-align: middle;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-svg--sm {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-svg--md {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-svg--lg {
+  width: 24px;
+  height: 24px;
+}
+
+/* 状态消息图标 */
+.status-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-icon--error {
+  color: #e74c3c;
+}
+
+.status-icon--success {
+  color: #27ae60;
 }
 
 .toast--error {
