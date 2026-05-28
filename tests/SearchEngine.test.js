@@ -126,4 +126,41 @@ test('updateSource: 非数组参数转为空数组', () => {
     assertEqual(engine.data.length, 0);
 });
 
+test('filter: #tag 匹配带标签的项', () => {
+    const engine = new SearchEngine([
+        { name: 'GitHub', url: 'https://github.com', tags: ['dev', 'code'] },
+        { name: 'Google', url: 'https://google.com', tags: ['search'] }
+    ]);
+    const result = engine.filter('#dev', 'exact');
+    assertEqual(result.length, 1);
+    assertEqual(result[0].name, 'GitHub');
+});
+
+test('filter: #tag 未知标签返回空', () => {
+    const engine = new SearchEngine([
+        { name: 'GitHub', url: 'https://github.com', tags: ['dev'] }
+    ]);
+    const result = engine.filter('#unknown', 'exact');
+    assertEqual(result.length, 0);
+});
+
+test('filter: #tag 加关键词组合过滤', () => {
+    const engine = new SearchEngine([
+        { name: 'GitHub', url: 'https://github.com', tags: ['dev'] },
+        { name: 'GitLab', url: 'https://gitlab.com', tags: ['dev'] }
+    ]);
+    const result = engine.filter('#dev git', 'exact');
+    assertEqual(result.length, 2);
+});
+
+test('filter: #tag 无标签的项不匹配', () => {
+    const engine = new SearchEngine([
+        { name: 'GitHub', url: 'https://github.com' },
+        { name: 'Google', url: 'https://google.com', tags: ['search'] }
+    ]);
+    const result = engine.filter('#search', 'exact');
+    assertEqual(result.length, 1);
+    assertEqual(result[0].name, 'Google');
+});
+
 console.log('\nSearchEngine 测试完成');
