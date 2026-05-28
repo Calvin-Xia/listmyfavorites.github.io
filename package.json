@@ -1,0 +1,17 @@
+{
+    "name": "listmyfavorites",
+    "version": "1.0.0",
+    "private": true,
+    "description": "个人网络收藏夹 - 纯静态云同步",
+    "scripts": {
+        "lint": "eslint script.js",
+        "format": "prettier --check script.js",
+        "format:fix": "prettier --write script.js",
+        "test": "node tests/SearchEngine.test.js && node tests/FavoritesService.test.js",
+        "test:all": "node tests/SearchEngine.test.js && node tests/FavoritesService.test.js && node tests/TokenStorage.test.js && node tests/FavoritesView.test.js && node tests/ModalController.test.js && node tests/FavoritesApp.test.js"
+    },
+    "devDependencies": {
+        "eslint": "^8.56.0",
+        "prettier": "^3.2.0"
+    }
+}

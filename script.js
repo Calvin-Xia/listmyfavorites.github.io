@@ -3,6 +3,9 @@
  * @property {string} name - 网站名称
  * @property {string} url - 网站地址
  * @property {string} [description] - 可选的描述
+ * @property {string[]} [tags] - 可选的标签列表
+ * @property {string} [createdAt] - 创建时间 (ISO8601)
+ * @property {string} [updatedAt] - 更新时间 (ISO8601)
  */
 
 /**
@@ -17,6 +20,7 @@
  * @property {string} name - 名称
  * @property {string} url - 网址
  * @property {string} description - 描述
+ * @property {string} tags - 逗号分隔的标签字符串
  */
 
 /**
@@ -67,6 +71,191 @@ const GIST_CONFIG = Object.freeze({
     id: '9c84112f9a5affcc63d4693a6282f74f',
     filename: 'data.json'
 });
+
+/**
+ * 国际化翻译对象
+ * @type {Object}
+ */
+const TRANSLATIONS = {
+    zh: {
+        title: '我的网络收藏夹',
+        searchPlaceholder: '搜索网站名称或网址...',
+        exactSearch: '精确搜索 (顺序匹配)',
+        addBtn: '＋ 添加',
+        exportBtn: '导出',
+        importBtn: '导入',
+        modalTitle: '添加新收藏',
+        editModalTitle: '编辑收藏',
+        nameLabel: '名称',
+        namePlaceholder: '例如: GitHub',
+        urlLabel: '网址',
+        urlPlaceholder: 'https://...',
+        descLabel: '描述 (可选)',
+        descPlaceholder: '简短的描述...',
+        tagsLabel: '标签 (可选，逗号分隔)',
+        tagsPlaceholder: '例如: 工具, 设计, 学习',
+        saveBtn: '保存到 Gist',
+        updateBtn: '更新',
+        savingBtn: '正在保存...',
+        tokenTip: '首次使用需要配置 GitHub Token (需开启 Gist 权限)',
+        tokenPlaceholder: '粘贴 GitHub Personal Access Token',
+        saveTokenBtn: '保存配置',
+        resetTokenBtn: '重置 Token',
+        applyTokenLink: '去 GitHub 申请 Token →',
+        loadingMsg: '正在从云端加载收藏夹...',
+        noResults: '没有找到匹配的网站',
+        editBtn: '编辑',
+        deleteBtn: '删除',
+        offlineMsg: '⚠️ 当前处于离线状态，显示的是缓存数据',
+        copyright: '© 2025 My Favorites',
+        confirmDelete: (name) => `确定要删除"${name}"吗？`,
+        saveSuccess: '保存成功！收藏夹已刷新。',
+        updateSuccess: '更新成功！收藏夹已刷新。',
+        deleteSuccess: '删除成功',
+        exportSuccess: '导出成功',
+        importSuccess: (count) => `成功导入 ${count} 个收藏项`,
+        tokenRequired: '请先配置 Token',
+        nameUrlRequired: '名称和网址不能为空',
+        invalidUrl: '请输入有效的网址（需以 http:// 或 https:// 开头）',
+        nameTooLong: '名称不能超过 100 个字符',
+        descTooLong: '描述不能超过 500 个字符',
+        tokenSaved: 'Token 保存成功',
+        tokenCleared: 'Token 已清除',
+        confirmClearToken: '确定要清除本地保存的 Token 吗？',
+        tokenEmpty: 'Token 不能为空',
+        importNotArray: '导入文件格式错误：不是数组',
+        importNoValid: '导入文件中没有有效的收藏项',
+        importAllExists: '所有收藏项已存在，无需导入',
+        importValidationFail: '导入验证失败',
+        appError: '应用发生错误，请刷新页面重试',
+        searchUnavailable: '搜索功能不可用',
+        loadFailed: '加载失败',
+        saveFailed: '保存失败',
+        deleteFailed: '删除失败',
+        importFailed: '导入失败',
+        networkError: '网络连接失败',
+        authError: '认证失败',
+        validationError: '数据错误',
+        unknownError: '加载失败',
+        statusSaving: '正在保存到云端...',
+        statusUpdating: '正在更新...'
+    },
+    en: {
+        title: 'My Favorites',
+        searchPlaceholder: 'Search by name or URL...',
+        exactSearch: 'Exact search (sequence match)',
+        addBtn: '＋ Add',
+        exportBtn: 'Export',
+        importBtn: 'Import',
+        modalTitle: 'Add New Favorite',
+        editModalTitle: 'Edit Favorite',
+        nameLabel: 'Name',
+        namePlaceholder: 'e.g. GitHub',
+        urlLabel: 'URL',
+        urlPlaceholder: 'https://...',
+        descLabel: 'Description (optional)',
+        descPlaceholder: 'Short description...',
+        tagsLabel: 'Tags (optional, comma-separated)',
+        tagsPlaceholder: 'e.g. tools, design, learning',
+        saveBtn: 'Save to Gist',
+        updateBtn: 'Update',
+        savingBtn: 'Saving...',
+        tokenTip: 'First time requires GitHub Token (with Gist permission)',
+        tokenPlaceholder: 'Paste GitHub Personal Access Token',
+        saveTokenBtn: 'Save Config',
+        resetTokenBtn: 'Reset Token',
+        applyTokenLink: 'Get GitHub Token →',
+        loadingMsg: 'Loading favorites from cloud...',
+        noResults: 'No matching websites found',
+        editBtn: 'Edit',
+        deleteBtn: 'Delete',
+        offlineMsg: '⚠️ You are offline. Showing cached data.',
+        copyright: '© 2025 My Favorites',
+        confirmDelete: (name) => `Delete "${name}"?`,
+        saveSuccess: 'Saved! Favorites refreshed.',
+        updateSuccess: 'Updated! Favorites refreshed.',
+        deleteSuccess: 'Deleted successfully',
+        exportSuccess: 'Export successful',
+        importSuccess: (count) => `Imported ${count} favorites`,
+        tokenRequired: 'Please configure Token first',
+        nameUrlRequired: 'Name and URL are required',
+        invalidUrl: 'Please enter a valid URL (starting with http:// or https://)',
+        nameTooLong: 'Name cannot exceed 100 characters',
+        descTooLong: 'Description cannot exceed 500 characters',
+        tokenSaved: 'Token saved successfully',
+        tokenCleared: 'Token cleared',
+        confirmClearToken: 'Clear saved Token?',
+        tokenEmpty: 'Token cannot be empty',
+        importNotArray: 'Import format error: not an array',
+        importNoValid: 'No valid favorites in import file',
+        importAllExists: 'All favorites already exist',
+        importValidationFail: 'Import validation failed',
+        appError: 'Application error, please refresh',
+        searchUnavailable: 'Search unavailable',
+        loadFailed: 'Failed to load data',
+        saveFailed: 'Save failed',
+        deleteFailed: 'Delete failed',
+        importFailed: 'Import failed',
+        networkError: 'Network error',
+        authError: 'Authentication failed',
+        validationError: 'Validation error',
+        unknownError: 'Load failed',
+        statusSaving: 'Saving to cloud...',
+        statusUpdating: 'Updating...'
+    }
+};
+
+/**
+ * 语言管理器 - 处理界面语言切换与持久化
+ * @type {Object}
+ */
+const LanguageManager = {
+    /** @type {string} */
+    current: 'zh',
+
+    /**
+     * 初始化语言设置，优先读取 localStorage，其次检测浏览器语言
+     * @returns {void}
+     */
+    init() {
+        const saved = localStorage.getItem('lang');
+        if (saved && TRANSLATIONS[saved]) {
+            this.current = saved;
+        } else if (navigator.language.startsWith('en')) {
+            this.current = 'en';
+        }
+    },
+
+    /**
+     * 获取翻译文本
+     * @param {string} key - 翻译键名
+     * @returns {string|Function} 翻译文本或翻译函数
+     */
+    t(key) {
+        return TRANSLATIONS[this.current]?.[key] ?? TRANSLATIONS.zh[key] ?? key;
+    },
+
+    /**
+     * 设置语言
+     * @param {string} lang - 语言代码
+     * @returns {void}
+     */
+    setLang(lang) {
+        if (TRANSLATIONS[lang]) {
+            this.current = lang;
+            localStorage.setItem('lang', lang);
+            document.documentElement.setAttribute('lang', lang);
+        }
+    },
+
+    /**
+     * 切换语言
+     * @returns {void}
+     */
+    toggle() {
+        this.setLang(this.current === 'zh' ? 'en' : 'zh');
+    }
+};
 
 /**
  * Token 存储管理器
@@ -136,6 +325,25 @@ class FavoritesService {
     }
 
     /**
+     * 带指数退避的重试
+     * @param {Function} fn - 要重试的异步函数
+     * @param {number} [maxRetries=3] - 最大重试次数
+     * @param {number} [baseDelay=1000] - 基础延迟（毫秒）
+     * @returns {Promise<*>} 函数结果
+     */
+    static async retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                return await fn();
+            } catch (error) {
+                if (attempt === maxRetries) throw error;
+                const delay = baseDelay * Math.pow(2, attempt);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    }
+
+    /**
      * 构建数据获取 URL
      * @returns {string} 数据文件 URL
      */
@@ -158,12 +366,14 @@ class FavoritesService {
      * @throws {Error} HTTP 请求失败时抛出错误
      */
     async fetchAll(signal) {
-        const url = `${this.buildDataUrl()}?t=${Date.now()}`;
-        const response = await fetch(url, { signal });
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        return response.json();
+        return FavoritesService.retryWithBackoff(async () => {
+            const url = `${this.buildDataUrl()}?t=${Date.now()}`;
+            const response = await fetch(url, { signal });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        });
     }
 
     /**
@@ -200,17 +410,19 @@ class FavoritesService {
      * @throws {Error} 请求失败时抛出错误
      */
     async fetchGist(token) {
-        const response = await fetch(this.buildApiUrl(), {
-            headers: {
-                Authorization: `token ${token}`
+        return FavoritesService.retryWithBackoff(async () => {
+            const response = await fetch(this.buildApiUrl(), {
+                headers: {
+                    Authorization: `token ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('拉取 Gist 信息失败，请检查 Token 权限');
             }
+
+            return response.json();
         });
-
-        if (!response.ok) {
-            throw new Error('拉取 Gist 信息失败，请检查 Token 权限');
-        }
-
-        return response.json();
     }
 
     /**
@@ -258,6 +470,77 @@ class FavoritesService {
             throw new Error('更新 Gist 失败');
         }
     }
+
+    /**
+     * 根据 URL 查找收藏项
+     * @param {string} url - 要查找的 URL
+     * @returns {Promise<{item: FavoriteItem, index: number} | null>} 查找结果
+     */
+    async findByUrl(url) {
+        const list = await this.fetchAll(new AbortController().signal);
+        const index = list.findIndex(item => item.url === url);
+        if (index === -1) return null;
+        return { item: list[index], index };
+    }
+
+    /**
+     * 编辑指定索引的收藏项
+     * @param {number} index - 要编辑的项索引
+     * @param {FavoriteItem} updatedItem - 更新后的数据
+     * @param {string} token - GitHub Token
+     * @returns {Promise<void>}
+     * @throws {Error} 索引无效或请求失败时抛出错误
+     */
+    async edit(index, updatedItem, token) {
+        if (!token) {
+            throw new Error('缺少访问 Token');
+        }
+        if (this.isUpdating) {
+            throw new Error('正在保存中，请稍后再试');
+        }
+        this.isUpdating = true;
+        try {
+            const gist = await this.fetchGist(token);
+            const rawContent = gist.files?.[this.filename]?.content ?? '[]';
+            const list = this.parseContent(rawContent);
+            if (index < 0 || index >= list.length) {
+                throw new Error('无效的收藏索引');
+            }
+            list[index] = { ...list[index], ...updatedItem, updatedAt: new Date().toISOString() };
+            await this.updateGist(list, token);
+        } finally {
+            this.isUpdating = false;
+        }
+    }
+
+    /**
+     * 删除指定索引的收藏项
+     * @param {number} index - 要删除的项索引
+     * @param {string} token - GitHub Token
+     * @returns {Promise<void>}
+     * @throws {Error} 索引无效或请求失败时抛出错误
+     */
+    async delete(index, token) {
+        if (!token) {
+            throw new Error('缺少访问 Token');
+        }
+        if (this.isUpdating) {
+            throw new Error('正在保存中，请稍后再试');
+        }
+        this.isUpdating = true;
+        try {
+            const gist = await this.fetchGist(token);
+            const rawContent = gist.files?.[this.filename]?.content ?? '[]';
+            const list = this.parseContent(rawContent);
+            if (index < 0 || index >= list.length) {
+                throw new Error('无效的收藏索引');
+            }
+            list.splice(index, 1);
+            await this.updateGist(list, token);
+        } finally {
+            this.isUpdating = false;
+        }
+    }
 }
 
 /**
@@ -281,8 +564,23 @@ class FavoritesView {
      * @param {string} [message='正在从云端加载收藏夹...'] - 加载消息
      * @returns {void}
      */
-    showLoading(message = '正在从云端加载收藏夹...') {
-        this.showMessage(message, '#666');
+    showLoading(message = LanguageManager.t('loadingMsg')) {
+        this.listEl.style.display = 'grid';
+        this.listEl.innerHTML = '';
+        this.emptyEl.style.display = 'none';
+
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < 6; i++) {
+            const card = document.createElement('div');
+            card.className = 'skeleton-card';
+            card.innerHTML = `
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line skeleton-line--medium"></div>
+                <div class="skeleton-line skeleton-line--short"></div>
+            `;
+            fragment.appendChild(card);
+        }
+        this.listEl.appendChild(fragment);
     }
 
     /**
@@ -319,7 +617,7 @@ class FavoritesView {
      * @param {FavoriteItem[]} items - 要渲染的收藏项
      * @returns {void}
      */
-    render(items) {
+    render(items, showActions = false) {
         this.listEl.innerHTML = '';
 
         if (!items || items.length === 0) {
@@ -332,8 +630,8 @@ class FavoritesView {
         this.emptyEl.style.display = 'none';
 
         const fragment = document.createDocumentFragment();
-        items.forEach((item) => {
-            fragment.appendChild(this.buildCard(item));
+        items.forEach((item, index) => {
+            fragment.appendChild(this.buildCard(item, index, showActions));
         });
         this.listEl.appendChild(fragment);
     }
@@ -341,9 +639,10 @@ class FavoritesView {
     /**
      * 构建卡片元素
      * @param {FavoriteItem} item - 收藏项数据
+     * @param {number} [index=0] - 卡片索引（用于动画延迟）
      * @returns {HTMLAnchorElement} 卡片元素
      */
-    buildCard(item) {
+    buildCard(item, index = 0, showActions = false) {
         const card = document.createElement('a');
         card.className = 'favorite-card';
         
@@ -361,6 +660,15 @@ class FavoritesView {
         card.target = '_blank';
         card.rel = 'noopener noreferrer';
 
+        card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                card.click();
+            }
+        });
+
+        card.style.setProperty('--delay', `${index * 0.05}s`);
+
         const title = document.createElement('div');
         title.className = 'card-title';
         title.textContent = item.name ?? '';
@@ -377,6 +685,45 @@ class FavoritesView {
             desc.className = 'card-desc';
             desc.textContent = item.description;
             card.appendChild(desc);
+        }
+
+        if (item.tags && item.tags.length > 0) {
+            const tagsContainer = document.createElement('div');
+            tagsContainer.className = 'card-tags';
+            item.tags.forEach(tag => {
+                const pill = document.createElement('span');
+                pill.className = 'tag-pill';
+                pill.textContent = tag;
+                tagsContainer.appendChild(pill);
+            });
+            card.appendChild(tagsContainer);
+        }
+
+        if (showActions) {
+            const actions = document.createElement('div');
+            actions.className = 'card-actions';
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'card-action-btn';
+            editBtn.textContent = LanguageManager.t('editBtn');
+            editBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                card.dispatchEvent(new CustomEvent('edit-favorite', { bubbles: true, detail: { index } }));
+            });
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'card-action-btn card-action-btn--danger';
+            deleteBtn.textContent = LanguageManager.t('deleteBtn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                card.dispatchEvent(new CustomEvent('delete-favorite', { bubbles: true, detail: { index } }));
+            });
+
+            actions.appendChild(editBtn);
+            actions.appendChild(deleteBtn);
+            card.appendChild(actions);
         }
 
         return card;
@@ -417,6 +764,22 @@ class SearchEngine {
         const query = term.trim().toLowerCase();
         if (!query) {
             return this.data;
+        }
+
+        // Handle #tag syntax
+        if (query.startsWith('#')) {
+            const tagPart = query.slice(1).split(' ')[0].toLowerCase();
+            const remainingQuery = query.slice(1 + tagPart.length).trim();
+            const tagMatches = this.data.filter(item =>
+                item.tags && item.tags.some(t => t.toLowerCase() === tagPart)
+            );
+            if (remainingQuery) {
+                return tagMatches.filter(item => {
+                    const target = `${item.name ?? ''} ${item.url ?? ''} ${item.description ?? ''}`.toLowerCase();
+                    return target.includes(remainingQuery);
+                });
+            }
+            return tagMatches;
         }
 
         if (mode === 'exact') {
@@ -538,6 +901,13 @@ class ModalController {
             const payload = this.serializeForm();
             onSubmit?.(payload);
         });
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && this.modal.classList.contains('active')) {
+                this.close();
+                onClose?.();
+            }
+        });
     }
 
     /**
@@ -547,6 +917,23 @@ class ModalController {
     open() {
         this.modal.classList.add('active');
         this.resetStatus();
+        document.getElementById('modalTitle').textContent = LanguageManager.t('modalTitle');
+        this.submitBtn.textContent = LanguageManager.t('saveBtn');
+        if (this._focusTrapHandler) {
+            this.modal.removeEventListener('keydown', this._focusTrapHandler);
+        }
+        this._focusTrapHandler = (e) => this._trapFocus(e);
+        this.modal.addEventListener('keydown', this._focusTrapHandler);
+    }
+
+    openForEdit(item) {
+        this.open();
+        this.addForm.querySelector('#siteName').value = item.name || '';
+        this.addForm.querySelector('#siteUrl').value = item.url || '';
+        this.addForm.querySelector('#siteDesc').value = item.description || '';
+        this.addForm.querySelector('#siteTags').value = (item.tags || []).join(', ');
+        document.getElementById('modalTitle').textContent = LanguageManager.t('editModalTitle');
+        this.submitBtn.textContent = LanguageManager.t('updateBtn');
     }
 
     /**
@@ -556,6 +943,34 @@ class ModalController {
     close() {
         this.modal.classList.remove('active');
         this.resetStatus();
+        if (this._focusTrapHandler) {
+            this.modal.removeEventListener('keydown', this._focusTrapHandler);
+        }
+    }
+
+    /**
+     * 捕获焦点在模态框内循环
+     * @param {KeyboardEvent} event - 键盘事件
+     * @returns {void}
+     */
+    _trapFocus(event) {
+        if (event.key !== 'Tab') return;
+        const focusable = this.modal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey) {
+            if (document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            }
+        } else {
+            if (document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
     }
 
     /**
@@ -566,7 +981,8 @@ class ModalController {
         return {
             name: this.addForm.querySelector('#siteName')?.value.trim() ?? '',
             url: this.addForm.querySelector('#siteUrl')?.value.trim() ?? '',
-            description: this.addForm.querySelector('#siteDesc')?.value.trim() ?? ''
+            description: this.addForm.querySelector('#siteDesc')?.value.trim() ?? '',
+            tags: this.addForm.querySelector('#siteTags')?.value.trim() ?? ''
         };
     }
 
@@ -600,7 +1016,7 @@ class ModalController {
      */
     setSavingState(isSaving) {
         this.submitBtn.disabled = isSaving;
-        this.submitBtn.textContent = isSaving ? '正在保存...' : '保存到 Gist';
+        this.submitBtn.textContent = isSaving ? LanguageManager.t('savingBtn') : LanguageManager.t('saveBtn');
     }
 
     /**
@@ -656,7 +1072,8 @@ class FavoritesApp {
         /** @type {AppState} */
         this.state = {
             favorites: [],
-            token: storage.get()
+            token: storage.get(),
+            editIndex: null
         };
 
         /** @type {SearchEngine} */
@@ -674,6 +1091,23 @@ class FavoritesApp {
         this.bindSearch();
         this.setupModal();
         this.loadFavorites();
+
+        this.view.listEl.addEventListener('edit-favorite', (e) => {
+            this.openForEdit(e.detail.index);
+        });
+        this.view.listEl.addEventListener('delete-favorite', (e) => {
+            this.handleDeleteFavorite(e.detail.index);
+        });
+
+        this.view.listEl.addEventListener('click', (e) => {
+            const tagPill = e.target.closest('.tag-pill');
+            if (tagPill) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.searchInput.value = tagPill.textContent;
+                this.applySearch();
+            }
+        });
     }
 
     /**
@@ -681,8 +1115,10 @@ class FavoritesApp {
      * @returns {void}
      */
     bindSearch() {
+        let debounceTimer;
         const triggerSearch = () => {
-            this.applySearch();
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => this.applySearch(), 250);
         };
 
         this.searchInput.addEventListener('input', triggerSearch);
@@ -704,16 +1140,16 @@ class FavoritesApp {
             },
             onSaveToken: (token) => {
                 if (!token) {
-                    this.modal.showStatus('Token 不能为空', 'error');
+                    this.modal.showStatus(LanguageManager.t('tokenEmpty'), 'error');
                     return;
                 }
                 this.storage.set(token);
                 this.state.token = token;
                 this.modal.syncTokenState(true);
-                this.modal.showStatus('Token 保存成功');
+                this.modal.showStatus(LanguageManager.t('tokenSaved'));
             },
             onClearToken: () => {
-                const confirmed = window.confirm('确定要清除本地保存的 Token 吗？');
+                const confirmed = window.confirm(LanguageManager.t('confirmClearToken'));
                 if (!confirmed) {
                     return;
                 }
@@ -721,7 +1157,7 @@ class FavoritesApp {
                 this.state.token = '';
                 this.modal.fillToken('');
                 this.modal.syncTokenState(false);
-                this.modal.showStatus('Token 已清除');
+                this.modal.showStatus(LanguageManager.t('tokenCleared'));
             },
             onSubmit: (payload) => {
                 this.handleCreateFavorite(payload);
@@ -750,7 +1186,9 @@ class FavoritesApp {
                 return;
             }
             console.error('加载数据失败:', error);
-            this.view.showError(`加载数据失败：${error.message}`);
+            const type = this._classifyError(error);
+            const prefix = type === 'network' ? LanguageManager.t('networkError') : type === 'auth' ? LanguageManager.t('authError') : LanguageManager.t('loadFailed');
+            this.view.showError(`${prefix}：${error.message}`);
         }
     }
 
@@ -762,18 +1200,19 @@ class FavoritesApp {
     applySearch(forceFullRender = false) {
         const term = this.searchInput.value ?? '';
         const mode = this.exactMatchCheckbox.checked ? 'exact' : 'fuzzy';
+        const showActions = Boolean(this.state.token);
 
         if (!term.trim() || forceFullRender) {
-            this.view.render(this.state.favorites);
+            this.view.render(this.state.favorites, showActions);
             return;
         }
 
         try {
             const result = this.searchEngine.filter(term, mode);
-            this.view.render(result);
+            this.view.render(result, showActions);
         } catch (error) {
             console.error('搜索失败:', error);
-            this.view.showError(`搜索功能不可用：${error.message}`);
+            this.view.showError(`${LanguageManager.t('searchUnavailable')}：${error.message}`);
         }
     }
 
@@ -786,11 +1225,14 @@ class FavoritesApp {
         const sanitized = {
             name: payload.name.trim(),
             url: payload.url.trim(),
-            description: payload.description.trim()
+            description: payload.description.trim(),
+            tags: payload.tags
+                ? payload.tags.split(',').map(t => t.trim()).filter(Boolean)
+                : []
         };
 
         if (!sanitized.name || !sanitized.url) {
-            this.modal.showStatus('名称和网址不能为空', 'error');
+            this.modal.showStatus(LanguageManager.t('nameUrlRequired'), 'error');
             return;
         }
 
@@ -800,61 +1242,213 @@ class FavoritesApp {
                 throw new Error('Invalid protocol');
             }
         } catch (e) {
-            this.modal.showStatus('请输入有效的网址（需以 http:// 或 https:// 开头）', 'error');
+            this.modal.showStatus(LanguageManager.t('invalidUrl'), 'error');
             return;
         }
 
         if (sanitized.name.length > 100) {
-            this.modal.showStatus('名称不能超过 100 个字符', 'error');
+            this.modal.showStatus(LanguageManager.t('nameTooLong'), 'error');
             return;
         }
 
         if (sanitized.description.length > 500) {
-            this.modal.showStatus('描述不能超过 500 个字符', 'error');
+            this.modal.showStatus(LanguageManager.t('descTooLong'), 'error');
             return;
         }
 
         if (!this.state.token) {
-            this.modal.showStatus('请先配置 Token', 'error');
+            this.modal.showStatus(LanguageManager.t('tokenRequired'), 'error');
             this.modal.syncTokenState(false);
             return;
         }
 
+        const isEdit = this.state.editIndex !== null;
+
         try {
             this.modal.setSavingState(true);
-            this.modal.showStatus('正在保存到云端...');
-            await this.service.append(sanitized, this.state.token);
+            this.modal.showStatus(isEdit ? LanguageManager.t('statusUpdating') : LanguageManager.t('statusSaving'));
+            if (isEdit) {
+                await this.service.edit(this.state.editIndex, sanitized, this.state.token);
+                this.state.editIndex = null;
+            } else {
+                await this.service.append(sanitized, this.state.token);
+            }
             this.modal.resetForm();
             this.modal.close();
             await this.loadFavorites();
-            window.alert('保存成功！收藏夹已刷新。');
+            window.alert(isEdit ? LanguageManager.t('updateSuccess') : LanguageManager.t('saveSuccess'));
         } catch (error) {
-            console.error('保存失败:', error);
-            this.modal.showStatus(`保存失败：${error.message}`, 'error');
+            console.error(isEdit ? '更新失败:' : '保存失败:', error);
+            const type = this._classifyError(error);
+            const prefix = type === 'auth' ? LanguageManager.t('authError') : type === 'network' ? LanguageManager.t('networkError') : type === 'validation' ? LanguageManager.t('validationError') : LanguageManager.t('saveFailed');
+            this.modal.showStatus(`${prefix}：${error.message}`, 'error');
         } finally {
             this.modal.setSavingState(false);
         }
+    }
+
+    /**
+     * 打开编辑模态框
+     * @param {number} index - 要编辑的收藏项索引
+     * @returns {void}
+     */
+    openForEdit(index) {
+        const item = this.state.favorites[index];
+        if (!item) return;
+        this.state.editIndex = index;
+        this.modal.openForEdit(item);
+    }
+
+    /**
+     * 删除收藏项
+     * @param {number} index - 要删除的收藏项索引
+     * @returns {Promise<void>}
+     */
+    async handleDeleteFavorite(index) {
+        const item = this.state.favorites[index];
+        if (!item) return;
+        const confirmed = window.confirm(LanguageManager.t('confirmDelete')(item.name));
+        if (!confirmed) return;
+        if (!this.state.token) {
+            showToast(LanguageManager.t('tokenRequired'), 'error');
+            return;
+        }
+        try {
+            await this.service.delete(index, this.state.token);
+            await this.loadFavorites();
+            showToast(LanguageManager.t('deleteSuccess'), 'success');
+        } catch (error) {
+            console.error('删除失败:', error);
+            showToast(`${LanguageManager.t('deleteFailed')}：${error.message}`, 'error');
+        }
+    }
+
+    /**
+     * 导出收藏为 JSON 文件
+     * @returns {void}
+     */
+    exportFavorites() {
+        const data = JSON.stringify(this.state.favorites, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `favorites-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast(LanguageManager.t('exportSuccess'), 'success');
+    }
+
+    /**
+     * 验证导入数据的格式和内容
+     * @param {*} data - 要验证的数据
+     * @returns {{valid: boolean, errors: string[]}} 验证结果
+     */
+    _validateImportData(data) {
+        const errors = [];
+        if (!Array.isArray(data)) {
+            errors.push('导入数据不是数组');
+            return { valid: false, errors };
+        }
+        data.forEach((item, index) => {
+            if (!item || typeof item !== 'object') {
+                errors.push(`第 ${index + 1} 项不是对象`);
+                return;
+            }
+            if (typeof item.name !== 'string' || !item.name.trim()) {
+                errors.push(`第 ${index + 1} 项缺少名称`);
+            }
+            if (typeof item.url !== 'string' || !item.url.trim()) {
+                errors.push(`第 ${index + 1} 项缺少网址`);
+            } else {
+                try {
+                    const urlObj = new URL(item.url);
+                    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+                        errors.push(`第 ${index + 1} 项网址协议无效`);
+                    }
+                } catch {
+                    errors.push(`第 ${index + 1} 项网址格式无效`);
+                }
+            }
+            if (item.tags !== undefined && item.tags !== null) {
+                if (!Array.isArray(item.tags)) {
+                    errors.push(`第 ${index + 1} 项标签格式无效（应为数组）`);
+                } else if (!item.tags.every(t => typeof t === 'string')) {
+                    errors.push(`第 ${index + 1} 项标签包含非字符串值`);
+                }
+            }
+        });
+        return { valid: errors.length === 0, errors };
+    }
+
+    /**
+     * 分类错误类型
+     * @param {Error} error - 错误对象
+     * @returns {'auth'|'network'|'validation'|'unknown'} 错误类型
+     */
+    _classifyError(error) {
+        const msg = error.message || '';
+        if (msg.includes('Token') || msg.includes('权限') || msg.includes('401') || msg.includes('403')) {
+            return 'auth';
+        }
+        if (msg.includes('网络') || msg.includes('fetch') || msg.includes('Network') || msg.includes('Failed')) {
+            return 'network';
+        }
+        if (msg.includes('验证') || msg.includes('格式') || msg.includes('无效')) {
+            return 'validation';
+        }
+        return 'unknown';
+    }
+
+    /**
+     * 从 JSON 文件导入收藏
+     * @param {File} file - 要导入的 JSON 文件
+     * @returns {void}
+     */
+    importFavorites(file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const imported = JSON.parse(e.target.result);
+                const validation = this._validateImportData(imported);
+                if (!validation.valid) {
+                    showToast(`${LanguageManager.t('importValidationFail')}：${validation.errors[0]}`, 'error');
+                    return;
+                }
+                const existingUrls = new Set(this.state.favorites.map(f => f.url));
+                const newItems = imported.filter(item => !existingUrls.has(item.url));
+                if (newItems.length === 0) {
+                    showToast(LanguageManager.t('importAllExists'), 'error');
+                    return;
+                }
+                if (!this.state.token) {
+                    showToast(LanguageManager.t('tokenRequired'), 'error');
+                    return;
+                }
+                const merged = [...this.state.favorites, ...newItems];
+                await this.service.updateGist(merged, this.state.token);
+                await this.loadFavorites();
+                showToast(LanguageManager.t('importSuccess')(newItems.length), 'success');
+            } catch (error) {
+                console.error('导入失败:', error);
+                showToast(`${LanguageManager.t('importFailed')}：${error.message}`, 'error');
+            }
+        };
+        reader.readAsText(file);
     }
 }
 
 function showToast(message, type = 'error') {
     const toast = document.createElement('div');
     toast.textContent = message;
-    toast.style.position = 'fixed';
-    toast.style.bottom = '20px';
-    toast.style.left = '50%';
-    toast.style.transform = 'translateX(-50%)';
-    toast.style.backgroundColor = type === 'error' ? '#e74c3c' : '#333';
-    toast.style.color = '#fff';
-    toast.style.padding = '12px 24px';
-    toast.style.borderRadius = '8px';
-    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-    toast.style.zIndex = '9999';
-    toast.style.fontFamily = 'inherit';
-    toast.style.fontSize = '14px';
+    toast.className = 'toast';
+    if (type === 'error') {
+        toast.classList.add('toast--error');
+    } else if (type === 'success') {
+        toast.classList.add('toast--success');
+    }
     document.body.appendChild(toast);
     setTimeout(() => {
-        toast.style.transition = 'opacity 0.5s ease';
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 500);
     }, 3000);
@@ -863,12 +1457,12 @@ function showToast(message, type = 'error') {
 if (typeof window !== 'undefined') {
     window.addEventListener('error', (event) => {
         console.error('全局错误:', event.error);
-        showToast('应用发生错误，请刷新页面重试: ' + (event.error?.message || '未知错误'));
+        showToast(`${LanguageManager.t('appError')}: ` + (event.error?.message || LanguageManager.t('unknownError')));
     });
 
     window.addEventListener('unhandledrejection', (event) => {
         console.error('未处理的 Promise 错误:', event.reason);
-        showToast('应用发生错误，请刷新页面重试: ' + (event.reason?.message || '未知错误'));
+        showToast(`${LanguageManager.t('appError')}: ` + (event.reason?.message || LanguageManager.t('unknownError')));
     });
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -876,6 +1470,66 @@ if (typeof window !== 'undefined') {
         const noResults = document.getElementById('noResults');
         const searchInput = document.getElementById('searchInput');
         const exactMatchCheckbox = document.getElementById('exactMatch');
+
+        LanguageManager.init();
+        document.documentElement.setAttribute('lang', LanguageManager.current);
+
+        const langToggle = document.getElementById('langToggle');
+        const langText = langToggle.querySelector('.lang-toggle__text');
+
+        const updateUILanguage = () => {
+            langText.textContent = LanguageManager.current === 'zh' ? 'EN' : '中';
+            document.getElementById('searchInput').placeholder = LanguageManager.t('searchPlaceholder');
+            document.getElementById('addBtn').textContent = LanguageManager.t('addBtn');
+            document.getElementById('exportBtn').textContent = LanguageManager.t('exportBtn');
+            document.getElementById('importBtnLabel').textContent = LanguageManager.t('importBtn');
+            document.querySelector('h1').textContent = LanguageManager.t('title');
+            document.getElementById('exactMatchLabel').textContent = LanguageManager.t('exactSearch');
+            document.getElementById('noResults').textContent = LanguageManager.t('noResults');
+            document.getElementById('offlineBanner').textContent = LanguageManager.t('offlineMsg');
+            document.querySelector('footer p').textContent = LanguageManager.t('copyright');
+            document.getElementById('modalTitle').textContent = LanguageManager.t('modalTitle');
+            document.getElementById('tokenLabel').textContent = LanguageManager.t('tokenTip');
+            document.getElementById('tokenInput').placeholder = LanguageManager.t('tokenPlaceholder');
+            document.getElementById('saveTokenBtn').textContent = LanguageManager.t('saveTokenBtn');
+            document.getElementById('clearTokenBtn').textContent = LanguageManager.t('resetTokenBtn');
+            document.querySelector('#tokenSection .small-tip a').textContent = LanguageManager.t('applyTokenLink');
+            document.querySelector('label[for="siteName"]').textContent = LanguageManager.t('nameLabel');
+            document.getElementById('siteName').placeholder = LanguageManager.t('namePlaceholder');
+            document.querySelector('label[for="siteUrl"]').textContent = LanguageManager.t('urlLabel');
+            document.getElementById('siteUrl').placeholder = LanguageManager.t('urlPlaceholder');
+            document.querySelector('label[for="siteDesc"]').textContent = LanguageManager.t('descLabel');
+            document.getElementById('siteDesc').placeholder = LanguageManager.t('descPlaceholder');
+            document.querySelector('label[for="siteTags"]').textContent = LanguageManager.t('tagsLabel');
+            document.getElementById('siteTags').placeholder = LanguageManager.t('tagsPlaceholder');
+        };
+
+        langToggle.addEventListener('click', () => {
+            LanguageManager.toggle();
+            updateUILanguage();
+        });
+
+        updateUILanguage();
+
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('.theme-toggle__icon');
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            themeIcon.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeIcon.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
 
         const modal = new ModalController({
             modal: document.getElementById('modal'),
@@ -900,6 +1554,34 @@ if (typeof window !== 'undefined') {
         });
 
         app.init();
+
+        const offlineBanner = document.getElementById('offlineBanner');
+        const updateOnlineStatus = () => {
+            if (navigator.onLine) {
+                offlineBanner.classList.remove('visible');
+                setTimeout(() => { offlineBanner.style.display = 'none'; }, 300);
+            } else {
+                offlineBanner.style.display = 'block';
+                requestAnimationFrame(() => offlineBanner.classList.add('visible'));
+            }
+        };
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        if (!navigator.onLine) updateOnlineStatus();
+
+        document.getElementById('exportBtn').addEventListener('click', () => app.exportFavorites());
+        document.getElementById('importInput').addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                app.importFavorites(e.target.files[0]);
+                e.target.value = '';
+            }
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch((err) => {
+                console.error('SW 注册失败:', err);
+            });
+        }
     });
 }
 
@@ -911,6 +1593,8 @@ if (typeof module !== 'undefined' && module.exports) {
         ModalController,
         FavoritesApp,
         TokenStorage,
-        GIST_CONFIG
+        GIST_CONFIG,
+        TRANSLATIONS,
+        LanguageManager
     };
 }

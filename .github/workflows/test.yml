@@ -17,11 +17,32 @@ jobs:
         with:
           node-version: '20'
       
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Lint
+        run: npx eslint script.js
+      
+      - name: Format check
+        run: npx prettier --check script.js
+      
       - name: Run SearchEngine tests
         run: node tests/SearchEngine.test.js
       
       - name: Run FavoritesService tests
         run: node tests/FavoritesService.test.js
+      
+      - name: Run TokenStorage tests
+        run: node tests/TokenStorage.test.js
+      
+      - name: Run FavoritesView tests
+        run: node tests/FavoritesView.test.js
+      
+      - name: Run ModalController tests
+        run: node tests/ModalController.test.js
+      
+      - name: Run FavoritesApp tests
+        run: node tests/FavoritesApp.test.js
       
       - name: Check syntax
         run: node --check script.js

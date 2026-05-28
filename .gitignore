@@ -1,1 +1,4 @@
 .trae/
+.sisyphus/
+.playwright-mcp/
+node_modules/
