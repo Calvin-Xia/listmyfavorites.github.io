@@ -561,10 +561,9 @@ class FavoritesView {
 
     /**
      * 显示加载状态
-     * @param {string} [message='正在从云端加载收藏夹...'] - 加载消息
      * @returns {void}
      */
-    showLoading(message = LanguageManager.t('loadingMsg')) {
+    showLoading() {
         this.listEl.style.display = 'grid';
         this.listEl.innerHTML = '';
         this.emptyEl.style.display = 'none';

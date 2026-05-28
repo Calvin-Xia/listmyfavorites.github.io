@@ -11,10 +11,11 @@
     "globals": {
         "Fuse": "readonly"
     },
+    "extends": ["eslint:recommended"],
     "rules": {
-        "indent": ["error", 4],
-        "quotes": ["error", "single", { "avoidEscape": true }],
-        "semi": ["error", "always"],
+        "indent": "off",
+        "quotes": "off",
+        "semi": "off",
         "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
         "no-console": "off",
         "prefer-const": "error",
